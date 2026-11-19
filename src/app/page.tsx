@@ -117,9 +117,19 @@ export default function HomePage() {
   useEffect(() => {
     async function loadLiveMenu() {
       try {
-        const response = await apiRequest<{ success: boolean; items: MenuItem[] }>("/api/menu?limit=6");
+        const response = await apiRequest<{ success: boolean; items: Record<string, unknown>[] }>("/api/menu?limit=6");
         if (response.success && response.items && response.items.length > 0) {
-          setFeaturedPizzas(response.items);
+          const mappedItems: MenuItem[] = response.items.map((raw: Partial<MenuItem> & { itemName?: string; images?: string[] }) => ({
+            _id: String(raw._id),
+            name: String(raw.name || raw.itemName || "Artisan Pizza"),
+            description: String(raw.description || ""),
+            price: Number(raw.price || 14.99),
+            category: String(raw.category || "Special"),
+            image: String(raw.image || (Array.isArray(raw.images) && raw.images[0]) || "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&auto=format&fit=crop&q=80"),
+            rating: Number(raw.rating || 4.9),
+            preparationTime: Number(raw.preparationTime || 15),
+          }));
+          setFeaturedPizzas(mappedItems);
         }
       } catch (err) {
         console.warn("[Home Page] Using fallback featured pizzas:", err);

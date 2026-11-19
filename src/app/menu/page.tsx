@@ -108,27 +108,28 @@ function MenuContent() {
         if (selectedCategory && selectedCategory !== "All") queryParams.set("category", selectedCategory);
         if (sortOrder !== "none") queryParams.set("sort", sortOrder);
 
-        const response = await apiRequest<{ success: boolean; items: MenuItem[] }>(
+        const response = await apiRequest<{ success: boolean; items: Record<string, unknown>[] }>(
           `/api/menu?${queryParams.toString()}`
         );
 
         if (response.success && response.items && response.items.length > 0) {
-          setItems(response.items);
+          const mappedItems: MenuItem[] = response.items.map((raw: Partial<MenuItem> & { itemName?: string; images?: string[] }) => ({
+            _id: String(raw._id),
+            name: String(raw.name || raw.itemName || "Artisan Pizza"),
+            description: String(raw.description || ""),
+            price: Number(raw.price || 14.99),
+            category: String(raw.category || "Special"),
+            image: String(raw.image || (Array.isArray(raw.images) && raw.images[0]) || "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&auto=format&fit=crop&q=80"),
+            rating: Number(raw.rating || 4.9),
+            preparationTime: Number(raw.preparationTime || 15),
+          }));
+          setItems(mappedItems);
+        } else if (search.trim() || (selectedCategory && selectedCategory !== "All")) {
+          // Empty result for specific search/filter query
+          setItems([]);
         } else {
-          // If database is currently fresh without added vendor items, filter fallback items
-          let filtered = [...FALLBACK_MENU];
-          if (selectedCategory !== "All") {
-            filtered = filtered.filter(
-              (p) => p.category.toLowerCase() === selectedCategory.toLowerCase()
-            );
-          }
-          if (search.trim()) {
-            filtered = filtered.filter(
-              (p) =>
-                p.name.toLowerCase().includes(search.toLowerCase()) ||
-                p.description.toLowerCase().includes(search.toLowerCase())
-            );
-          }
+          // If no items in database, display fallback menu
+          const filtered = [...FALLBACK_MENU];
           if (sortOrder === "asc") {
             filtered.sort((a, b) => a.price - b.price);
           } else if (sortOrder === "desc") {

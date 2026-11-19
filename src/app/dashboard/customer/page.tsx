@@ -32,6 +32,25 @@ interface Order {
   createdAt: string;
 }
 
+interface RawOrder {
+  _id?: string;
+  itemId?: string;
+  itemName?: string;
+  itemPrice?: number;
+  itemCategory?: string;
+  status?: Order["status"];
+  deliveryAddress?: string;
+  deliveryDate?: string;
+  message?: string;
+  createdAt?: string;
+  menuItem?: {
+    itemName?: string;
+    name?: string;
+    price?: number;
+    category?: string;
+  };
+}
+
 function CustomerDashboardContent() {
   const { user } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
@@ -41,9 +60,21 @@ function CustomerDashboardContent() {
 
   const fetchOrders = async () => {
     try {
-      const response = await apiRequest<{ success: boolean; orders: Order[] }>("/api/orders/my-orders");
+      const response = await apiRequest<{ success: boolean; orders: RawOrder[] }>("/api/orders/my-orders");
       if (response.success && response.orders) {
-        setOrders(response.orders);
+        const mapped: Order[] = response.orders.map((o: RawOrder) => ({
+          _id: String(o._id || ""),
+          itemId: String(o.itemId || ""),
+          itemName: String(o.itemName || o.menuItem?.itemName || o.menuItem?.name || "Artisan Pizza"),
+          itemPrice: Number(o.itemPrice || o.menuItem?.price || 14.99),
+          itemCategory: String(o.itemCategory || o.menuItem?.category || "Special"),
+          status: o.status || "pending",
+          deliveryAddress: String(o.deliveryAddress || "Standard delivery"),
+          deliveryDate: String(o.deliveryDate || new Date().toISOString().split("T")[0]),
+          message: o.message || "",
+          createdAt: String(o.createdAt || new Date().toISOString()),
+        }));
+        setOrders(mapped);
       }
     } catch (err) {
       console.warn("[Customer Dashboard] Error fetching orders:", err);
@@ -56,9 +87,21 @@ function CustomerDashboardContent() {
     let isMounted = true;
     async function load() {
       try {
-        const response = await apiRequest<{ success: boolean; orders: Order[] }>("/api/orders/my-orders");
+        const response = await apiRequest<{ success: boolean; orders: RawOrder[] }>("/api/orders/my-orders");
         if (isMounted && response.success && response.orders) {
-          setOrders(response.orders);
+          const mapped: Order[] = response.orders.map((o: RawOrder) => ({
+            _id: String(o._id || ""),
+            itemId: String(o.itemId || ""),
+            itemName: String(o.itemName || o.menuItem?.itemName || o.menuItem?.name || "Artisan Pizza"),
+            itemPrice: Number(o.itemPrice || o.menuItem?.price || 14.99),
+            itemCategory: String(o.itemCategory || o.menuItem?.category || "Special"),
+            status: o.status || "pending",
+            deliveryAddress: String(o.deliveryAddress || "Standard delivery"),
+            deliveryDate: String(o.deliveryDate || new Date().toISOString().split("T")[0]),
+            message: o.message || "",
+            createdAt: String(o.createdAt || new Date().toISOString()),
+          }));
+          setOrders(mapped);
         }
       } catch (err) {
         if (isMounted) console.warn("[Customer Dashboard] Error fetching orders:", err);
