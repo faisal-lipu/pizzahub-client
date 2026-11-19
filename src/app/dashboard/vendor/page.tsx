@@ -58,6 +58,7 @@ function VendorDashboardContent() {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [category, setCategory] = useState("Pepperoni");
+  const [location, setLocation] = useState(user?.businessName || "Downtown Kitchen, New York");
   const [image, setImage] = useState("");
   const [prepTime, setPrepTime] = useState("15");
   const [addingItem, setAddingItem] = useState(false);
@@ -65,12 +66,12 @@ function VendorDashboardContent() {
 
   const fetchVendorData = async () => {
     try {
-      const menuRes = await apiRequest<{ success: boolean; items: MenuItem[] }>("/api/menu/vendor/my-items");
+      const menuRes = await apiRequest<{ success: boolean; items: MenuItem[] }>("/api/menu/my-items");
       if (menuRes.success && menuRes.items) {
         setItems(menuRes.items);
       }
 
-      const orderRes = await apiRequest<{ success: boolean; orders: VendorOrder[] }>("/api/orders/vendor/orders");
+      const orderRes = await apiRequest<{ success: boolean; orders: VendorOrder[] }>("/api/orders/vendor");
       if (orderRes.success && orderRes.orders) {
         setOrders(orderRes.orders);
       }
@@ -85,12 +86,12 @@ function VendorDashboardContent() {
     let isMounted = true;
     async function load() {
       try {
-        const menuRes = await apiRequest<{ success: boolean; items: MenuItem[] }>("/api/menu/vendor/my-items");
+        const menuRes = await apiRequest<{ success: boolean; items: MenuItem[] }>("/api/menu/my-items");
         if (isMounted && menuRes.success && menuRes.items) {
           setItems(menuRes.items);
         }
 
-        const orderRes = await apiRequest<{ success: boolean; orders: VendorOrder[] }>("/api/orders/vendor/orders");
+        const orderRes = await apiRequest<{ success: boolean; orders: VendorOrder[] }>("/api/orders/vendor");
         if (isMounted && orderRes.success && orderRes.orders) {
           setOrders(orderRes.orders);
         }
@@ -130,11 +131,14 @@ function VendorDashboardContent() {
       const response = await apiRequest<{ success: boolean; message: string }>("/api/menu", {
         method: "POST",
         data: {
+          itemName: name.trim(),
           name: name.trim(),
           description: description.trim(),
           price: parseFloat(price),
           category,
+          location: location.trim() || user?.businessName || "Downtown Kitchen, New York",
           image: image.trim() || "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&auto=format&fit=crop&q=80",
+          images: [image.trim() || "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&auto=format&fit=crop&q=80"],
           preparationTime: parseInt(prepTime) || 15,
         },
       });
@@ -532,6 +536,20 @@ function VendorDashboardContent() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Crispy pepperoni, melted mozzarella, roasted garlic oregano sauce..."
+                required
+                className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-sm focus:outline-none focus:border-[#D91E18]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                Kitchen / Branch Location *
+              </label>
+              <input
+                type="text"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="e.g. Downtown Kitchen, Manhattan, New York"
                 required
                 className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-sm focus:outline-none focus:border-[#D91E18]"
               />
