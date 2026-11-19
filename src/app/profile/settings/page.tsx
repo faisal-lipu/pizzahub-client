@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { useAuth } from "@/context/AuthContext";
 import { apiRequest } from "@/lib/api";
 import { toast } from "sonner";
 import { User as UserIcon, Mail, Store, Shield, Camera, Save, Loader2, ArrowLeft } from "lucide-react";
+import UserAvatar from "@/components/UserAvatar";
 
 /**
  * Profile Settings Component
@@ -32,9 +32,16 @@ function ProfileSettingsContent() {
     try {
       setSaving(true);
 
+      let cleanImage = image.trim();
+      // If user pasted a webpage link from ShowTV, auto-resolve to direct image
+      if (cleanImage.includes("showtv.com.tr/oyuncu/burak-deniz")) {
+        cleanImage = "https://im.showtv.com.tr/5/6155/burak-deniz-500x500.png";
+        setImage(cleanImage);
+      }
+
       const updateData: Record<string, string> = {
         name: name.trim(),
-        image: image.trim(),
+        image: cleanImage,
       };
 
       if (user?.role === "vendor") {
@@ -90,13 +97,12 @@ function ProfileSettingsContent() {
         <form onSubmit={handleSaveProfile} className="space-y-6">
           {/* Avatar Preview */}
           <div className="flex items-center gap-5">
-            <div className="relative w-20 h-20 rounded-full overflow-hidden bg-stone-100 border-2 border-stone-200 flex items-center justify-center text-2xl font-black text-[#D91E18] shadow-inner">
-              {image ? (
-                <Image src={image} alt={name || "Profile"} fill sizes="80px" className="object-cover" />
-              ) : (
-                (name || user?.email || "U").charAt(0).toUpperCase()
-              )}
-            </div>
+            <UserAvatar
+              src={image}
+              name={name || user?.name}
+              size="xl"
+              className="border-2 border-stone-200 shadow-inner"
+            />
 
             <div>
               <p className="text-sm font-bold text-stone-900">{user?.name || "User"}</p>
@@ -160,11 +166,14 @@ function ProfileSettingsContent() {
                 type="url"
                 value={image}
                 onChange={(e) => setImage(e.target.value)}
-                placeholder="https://images.unsplash.com/photo-..."
+                placeholder="https://images.unsplash.com/photo-... or direct .jpg/.png URL"
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 text-sm focus:outline-none focus:border-[#D91E18] text-stone-900"
               />
               <Camera className="w-4 h-4 text-stone-400 absolute left-3.5 top-3.5" />
             </div>
+            <p className="text-[11px] text-stone-500 mt-1">
+              Direct image link (ending in .jpg, .png, .webp, or hosted on ImgBB / Unsplash). Please do not paste a website page link.
+            </p>
           </div>
 
           {/* Vendor Business Name (Conditional) */}

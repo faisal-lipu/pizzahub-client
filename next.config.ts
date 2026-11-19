@@ -29,6 +29,16 @@ const nextConfig: NextConfig = {
         hostname: "images.pexels.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "im.showtv.com.tr",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "**.showtv.com.tr",
+        pathname: "/**",
+      },
     ],
   },
   turbopack: {

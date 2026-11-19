@@ -14,6 +14,7 @@ import {
   Menu,
   X,
 } from "lucide-react";
+import UserAvatar from "./UserAvatar";
 
 
 /**
@@ -190,19 +191,12 @@ export default function Navbar() {
                   className="flex items-center gap-1.5 text-[#D91E18] hover:scale-105 transition-transform p-0.5 cursor-pointer focus:outline-none"
                   aria-label="Open user profile menu"
                 >
-                  <div className="w-6 h-6 rounded-full overflow-hidden bg-red-50 border border-red-200 flex items-center justify-center text-xs font-bold text-[#D91E18] relative">
-                    {user.image ? (
-                      <Image
-                        src={user.image}
-                        alt={userName}
-                        fill
-                        sizes="24px"
-                        className="object-cover"
-                      />
-                    ) : (
-                      userName.charAt(0).toUpperCase()
-                    )}
-                  </div>
+                  <UserAvatar
+                    src={user.image}
+                    name={userName}
+                    size="xs"
+                    className="border-red-200"
+                  />
                 </button>
               ) : (
                 <button
