@@ -97,6 +97,17 @@ function VendorDashboardInner() {
 
   const [items, setItems] = useState<MenuItem[]>([]);
   const [orders, setOrders] = useState<VendorOrder[]>([]);
+  const [subscriptionTransactions, setSubscriptionTransactions] = useState<
+    Array<{
+      _id: string;
+      plan: string;
+      amount: number;
+      currency: string;
+      stripeSessionId: string;
+      status: string;
+      createdAt: string;
+    }>
+  >([]);
   const [loading, setLoading] = useState(true);
 
   // Add Item form state
@@ -137,6 +148,25 @@ function VendorDashboardInner() {
       const orderRes = await apiRequest<{ success: boolean; orders: VendorOrder[] }>("/api/orders/vendor");
       if (orderRes.success && orderRes.orders) {
         setOrders(orderRes.orders);
+      }
+
+      const subRes = await apiRequest<{
+        success: boolean;
+        subscriptionPlan: "free" | "premium";
+        subscriptionExpiresAt: string | null;
+        transactions: Array<{
+          _id: string;
+          plan: string;
+          amount: number;
+          currency: string;
+          stripeSessionId: string;
+          status: string;
+          createdAt: string;
+        }>;
+      }>("/api/payment/subscription-status").catch(() => null);
+
+      if (subRes?.success && subRes.transactions) {
+        setSubscriptionTransactions(subRes.transactions);
       }
     } catch (err) {
       console.warn("[Vendor Dashboard] Load error:", err);
@@ -1128,7 +1158,7 @@ function VendorDashboardInner() {
                       <span className="text-base text-amber-700">Premium</span>
                       <Crown className="w-4 h-4 text-amber-500 fill-amber-500" />
                     </div>
-                    <span className="text-xs text-stone-400 font-normal">$29.99 / month</span>
+                    <span className="text-xs text-stone-400 font-normal">$19.99 / month</span>
                   </td>
                   <td className="py-4 px-5 text-xs text-stone-700 font-medium">
                     Unlimited active items, Premium vendor badge, featured menu placement, all Free features
@@ -1164,8 +1194,57 @@ function VendorDashboardInner() {
                 className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-[#D91E18] hover:bg-[#B91C1C] text-white font-black text-sm shadow-lg shadow-red-500/30 transition-all cursor-pointer"
               >
                 <Crown className="w-4 h-4" />
-                <span>Upgrade to Premium Plan</span>
+                <span>Upgrade to Premium Plan ($19.99/mo)</span>
               </button>
+            </div>
+          )}
+
+          {/* Billing History & Receipts */}
+          {subscriptionTransactions.length > 0 && (
+            <div className="pt-6 border-t border-stone-200/80 space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-black text-stone-900">Subscription Billing History</h3>
+                  <p className="text-xs text-stone-500">Stripe payment confirmation records and receipts</p>
+                </div>
+              </div>
+
+              <div className="overflow-x-auto rounded-2xl border border-stone-200">
+                <table className="w-full text-xs text-left">
+                  <thead className="bg-stone-50 border-b border-stone-200 text-stone-400 uppercase text-[10px] font-bold">
+                    <tr>
+                      <th className="py-2.5 px-4">Date</th>
+                      <th className="py-2.5 px-4">Plan</th>
+                      <th className="py-2.5 px-4">Amount</th>
+                      <th className="py-2.5 px-4">Status</th>
+                      <th className="py-2.5 px-4 text-right">Stripe Reference</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-stone-100">
+                    {subscriptionTransactions.map((tx) => (
+                      <tr key={tx._id} className="hover:bg-stone-50/50">
+                        <td className="py-2.5 px-4 font-medium text-stone-700">
+                          {new Date(tx.createdAt).toLocaleDateString()}
+                        </td>
+                        <td className="py-2.5 px-4 font-bold text-stone-900 capitalize">
+                          {tx.plan} Vendor
+                        </td>
+                        <td className="py-2.5 px-4 font-black text-stone-900">
+                          ${Number(tx.amount).toFixed(2)} {tx.currency?.toUpperCase() || "USD"}
+                        </td>
+                        <td className="py-2.5 px-4">
+                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                            Completed
+                          </span>
+                        </td>
+                        <td className="py-2.5 px-4 text-right font-mono text-[11px] text-stone-500 truncate max-w-[140px]">
+                          {tx.stripeSessionId}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </div>
