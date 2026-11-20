@@ -437,16 +437,30 @@ function VendorDashboardInner() {
   const handleUpgradeSubscription = async () => {
     try {
       setActionInProgress("stripe-checkout");
+      const clientOrigin = typeof window !== "undefined" ? window.location.origin : undefined;
       const response = await apiRequest<{ success: boolean; url?: string; message?: string }>(
         "/api/payment/create-checkout-session",
         {
           method: "POST",
-          data: { planType: "vendor_premium" },
+          data: { 
+            planType: "vendor_premium",
+            clientUrl: clientOrigin,
+          },
         }
       );
 
       if (response.success && response.url) {
-        window.location.href = response.url;
+        let destUrl = response.url;
+        // Safety guard: If server returns localhost:3000 but user is on a deployed domain (e.g. Vercel),
+        // rewrite the domain to current browser origin.
+        if (
+          typeof window !== "undefined" &&
+          destUrl.startsWith("http://localhost:3000") &&
+          window.location.origin !== "http://localhost:3000"
+        ) {
+          destUrl = destUrl.replace("http://localhost:3000", window.location.origin);
+        }
+        window.location.href = destUrl;
       } else {
         toast.success("Subscription upgraded to Premium Plan! Unlimited items unlocked.");
         fetchVendorData();
