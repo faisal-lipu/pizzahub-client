@@ -9,6 +9,9 @@ import { useAuth } from "@/context/AuthContext";
 import { apiRequest } from "@/lib/api";
 import { uploadToImgBB } from "@/lib/imgbb";
 import { toast } from "sonner";
+import DonutChart from "@/components/dashboard/DonutChart";
+import BarChart from "@/components/dashboard/BarChart";
+import TrendChart from "@/components/dashboard/TrendChart";
 import {
   Store,
   PlusCircle,
@@ -517,6 +520,64 @@ function VendorDashboardInner() {
   const acceptedOrders = orders.filter((o) => o.status === "accepted").length;
   const currentPlan = user?.subscriptionPlan === "premium" ? "Premium Plan" : "Free Plan";
 
+  // Chart Data: Order Status Breakdown
+  const orderStatusChartData = React.useMemo(() => [
+    { label: "Pending Orders", value: pendingCustomerOrders, color: "#F59E0B" },
+    { label: "Accepted / In Oven", value: acceptedOrders, color: "#3B82F6" },
+    { label: "Delivered Hot", value: orders.filter((o) => o.status === "delivered").length, color: "#10B981" },
+    { label: "Cancelled / Rejected", value: orders.filter((o) => o.status === "cancelled" || o.status === "rejected").length, color: "#EF4444" },
+  ], [orders, pendingCustomerOrders, acceptedOrders]);
+
+  // Chart Data: Menu Status Breakdown
+  const vendorMenuStatusChartData = React.useMemo(() => [
+    { label: "Approved (Live)", value: activeMenuItems, color: "#10B981" },
+    { label: "Pending Review", value: items.filter((i) => i.status === "pending").length, color: "#F59E0B" },
+    { label: "Rejected", value: items.filter((i) => i.status === "rejected").length, color: "#EF4444" },
+    { label: "Inactive", value: items.filter((i) => i.status === "inactive").length, color: "#9CA3AF" },
+  ], [items, activeMenuItems]);
+
+  // Chart Data: Weekly Order Volume (7 Days)
+  const weeklyOrderVolumeData = React.useMemo(() => {
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const counts = [0, 0, 0, 0, 0, 0, 0];
+
+    orders.forEach((o) => {
+      if (o.createdAt) {
+        const d = new Date(o.createdAt).getDay();
+        counts[d] += 1;
+      }
+    });
+
+    return days.map((day, idx) => ({
+      label: day,
+      value: counts[idx],
+      color: counts[idx] > 0 ? "#D91E18" : "#E7E5E4",
+      formattedValue: `${counts[idx]} orders`,
+    }));
+  }, [orders]);
+
+  // Chart Data: Kitchen Revenue & Demand Trend
+  const vendorRevenueTrendData = React.useMemo(() => {
+    if (orders.length === 0) {
+      return [
+        { label: "Day 1", value: 0, formattedValue: "$0" },
+        { label: "Day 2", value: 0, formattedValue: "$0" },
+        { label: "Day 3", value: 0, formattedValue: "$0" },
+        { label: "Day 4", value: 0, formattedValue: "$0" },
+      ];
+    }
+    const points = orders.slice(-6).map((o, idx) => ({
+      label: o.createdAt
+        ? new Date(o.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+        : `Order ${idx + 1}`,
+      value: Number(o.itemPrice) || 16.99,
+      formattedValue: `$${(Number(o.itemPrice) || 16.99).toFixed(2)}`,
+    }));
+    return points.length >= 2
+      ? points
+      : [{ label: "Start", value: 0, formattedValue: "$0" }, ...points];
+  }, [orders]);
+
   return (
     <div className="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8">
       {/* Top Banner */}
@@ -661,6 +722,55 @@ function VendorDashboardInner() {
               </button>
             </div>
           )}
+
+          {/* Interactive Data Visualization Charts & Graphs */}
+          <div className="space-y-4 pt-2">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-black text-stone-900">Kitchen Analytics & Performance</h2>
+                <p className="text-xs text-stone-500 font-medium">Visual trends for order throughput, menu status, and daily kitchen activity</p>
+              </div>
+              <span className="text-xs font-bold text-amber-700 bg-amber-50 px-3 py-1 rounded-full border border-amber-200">
+                Kitchen Stats
+              </span>
+            </div>
+
+            {/* Row 1: Donut Charts (Order Pipeline & Recipe Verification) */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <DonutChart
+                title="Customer Order Fulfillment"
+                subtitle="Distribution of customer orders by kitchen status"
+                data={orderStatusChartData}
+                centerLabel="Total Orders"
+                centerValue={orders.length}
+              />
+
+              <DonutChart
+                title="Menu Verification Pipeline"
+                subtitle="Current standing of your submitted pizza recipes"
+                data={vendorMenuStatusChartData}
+                centerLabel="My Items"
+                centerValue={items.length}
+              />
+            </div>
+
+            {/* Row 2: Bar & Trend Charts (Weekly Volume & Sales Trend) */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <BarChart
+                title="Weekly Order Activity"
+                subtitle="Customer orders received per day of the week"
+                data={weeklyOrderVolumeData}
+              />
+
+              <TrendChart
+                title="Recent Order Sales Trajectory"
+                subtitle="Timeline of recent incoming order values and demand"
+                data={vendorRevenueTrendData}
+                valuePrefix="$"
+                lineColor="#D91E18"
+              />
+            </div>
+          </div>
         </div>
       )}
 

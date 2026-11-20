@@ -8,6 +8,9 @@ import ConfirmModal from "@/components/ConfirmModal";
 import { useAuth } from "@/context/AuthContext";
 import { apiRequest } from "@/lib/api";
 import { toast } from "sonner";
+import DonutChart from "@/components/dashboard/DonutChart";
+import BarChart from "@/components/dashboard/BarChart";
+import TrendChart from "@/components/dashboard/TrendChart";
 import {
   ShoppingBag,
   Clock,
@@ -191,6 +194,61 @@ function CustomerDashboardInner() {
   const pendingOrders = orders.filter((o) => o.status === "pending").length;
   const acceptedOrders = orders.filter((o) => o.status === "accepted").length;
   const rejectedOrders = orders.filter((o) => o.status === "rejected").length;
+
+  // Chart Data: Customer Order Status Breakdown
+  const customerOrderStatusData = React.useMemo(() => [
+    { label: "Delivered Hot", value: orders.filter((o) => o.status === "delivered").length, color: "#10B981" },
+    { label: "Accepted / In Oven", value: acceptedOrders, color: "#3B82F6" },
+    { label: "Pending Chef Review", value: pendingOrders, color: "#F59E0B" },
+    { label: "Cancelled / Rejected", value: rejectedOrders + orders.filter((o) => o.status === "cancelled").length, color: "#EF4444" },
+  ], [orders, acceptedOrders, pendingOrders, rejectedOrders]);
+
+  // Chart Data: Favorite Categories Breakdown
+  const customerCategoryData = React.useMemo(() => {
+    const counts: Record<string, number> = {
+      "Classic": 0,
+      "Meat Lovers": 0,
+      "Vegetarian": 0,
+      "Specialty": 0,
+    };
+    orders.forEach((o) => {
+      const cat = o.itemCategory || "";
+      if (cat.includes("Classic")) counts["Classic"] += 1;
+      else if (cat.includes("Meat")) counts["Meat Lovers"] += 1;
+      else if (cat.includes("Veg")) counts["Vegetarian"] += 1;
+      else counts["Specialty"] += 1;
+    });
+
+    return [
+      { label: "Classic Pizzas", value: counts["Classic"], color: "#EA580C" },
+      { label: "Meat Lovers", value: counts["Meat Lovers"], color: "#DC2626" },
+      { label: "Vegetarian", value: counts["Vegetarian"], color: "#16A34A" },
+      { label: "Specialty / Gourmet", value: counts["Specialty"], color: "#D97706" },
+    ];
+  }, [orders]);
+
+  // Chart Data: Spending & Orders Timeline
+  const customerSpendingTrendData = React.useMemo(() => {
+    if (orders.length === 0) {
+      return [
+        { label: "Order 1", value: 0, formattedValue: "$0" },
+        { label: "Order 2", value: 0, formattedValue: "$0" },
+        { label: "Order 3", value: 0, formattedValue: "$0" },
+        { label: "Order 4", value: 0, formattedValue: "$0" },
+      ];
+    }
+    const points = orders.slice(-6).map((o, idx) => ({
+      label: o.createdAt
+        ? new Date(o.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+        : `Order ${idx + 1}`,
+      value: Number(o.itemPrice) || 14.99,
+      formattedValue: `$${(Number(o.itemPrice) || 14.99).toFixed(2)}`,
+    }));
+    return points.length >= 2 ? points : [
+      { label: "Start", value: 0, formattedValue: "$0" },
+      ...points,
+    ];
+  }, [orders]);
 
   const getStatusBadge = (status: CustomerOrder["status"]) => {
     switch (status) {
@@ -402,6 +460,46 @@ function CustomerDashboardInner() {
                 ))}
               </div>
             )}
+          </div>
+
+          {/* Interactive Data Visualization Charts & Graphs */}
+          <div className="space-y-4 pt-2">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-black text-stone-900">Your Dining Trends & Insights</h2>
+                <p className="text-xs text-stone-500 font-medium">Visual analytics of your pizza cravings and order milestones</p>
+              </div>
+              <span className="text-xs font-bold text-stone-500 bg-stone-100 px-3 py-1 rounded-full">
+                Personal Activity
+              </span>
+            </div>
+
+            {/* Row 1: Charts (Order Status & Favorite Categories) */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <DonutChart
+                title="Your Order History Breakdown"
+                subtitle="Distribution of your total orders by status"
+                data={customerOrderStatusData}
+                centerLabel="Total Orders"
+                centerValue={totalOrders}
+              />
+
+              <BarChart
+                title="Your Top Pizza Categories"
+                subtitle="Pizzas ordered across craft recipes"
+                data={customerCategoryData}
+                horizontal
+              />
+            </div>
+
+            {/* Row 2: Spending / Order Timeline */}
+            <TrendChart
+              title="Order Spending Timeline"
+              subtitle="Progression of your recent artisan pizza orders"
+              data={customerSpendingTrendData}
+              valuePrefix="$"
+              lineColor="#D91E18"
+            />
           </div>
         </div>
       )}

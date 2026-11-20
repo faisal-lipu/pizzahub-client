@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { useAuth } from "@/context/AuthContext";
 import UserAvatar from "@/components/UserAvatar";
@@ -22,16 +22,16 @@ import {
   Crown,
   ChevronRight,
   Settings,
+  Users,
+  DollarSign,
 } from "lucide-react";
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
   const { user, logout } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const currentTab = searchParams.get("tab") || "overview";
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   // Role-based navigation items
@@ -41,34 +41,40 @@ export default function DashboardLayout({
     if (role === "vendor") {
       return [
         {
-          label: "Overview",
+          label: "Kitchen Overview",
           href: "/dashboard/vendor?tab=overview",
           icon: Store,
-          active: pathname === "/dashboard/vendor",
+          active: pathname === "/dashboard/vendor" && currentTab === "overview",
         },
         {
           label: "My Menu Items",
           href: "/dashboard/vendor?tab=menu",
           icon: Pizza,
-          active: false,
+          active: pathname === "/dashboard/vendor" && currentTab === "menu",
         },
         {
           label: "Add Menu Item",
           href: "/dashboard/vendor?tab=add",
           icon: PlusCircle,
-          active: false,
+          active: pathname === "/dashboard/vendor" && currentTab === "add",
         },
         {
           label: "Customer Orders",
           href: "/dashboard/vendor?tab=orders",
           icon: ShoppingBag,
-          active: false,
+          active: pathname === "/dashboard/vendor" && currentTab === "orders",
         },
         {
           label: "Subscription",
           href: "/dashboard/vendor?tab=subscription",
           icon: CreditCard,
-          active: false,
+          active: pathname === "/dashboard/vendor" && currentTab === "subscription",
+        },
+        {
+          label: "Profile Settings",
+          href: "/profile/settings",
+          icon: Settings,
+          active: pathname === "/profile/settings",
         },
       ];
     }
@@ -77,14 +83,32 @@ export default function DashboardLayout({
       return [
         {
           label: "Admin Overview",
-          href: "/dashboard/admin",
+          href: "/dashboard/admin?tab=overview",
           icon: ShieldAlert,
-          active: pathname === "/dashboard/admin",
+          active: pathname === "/dashboard/admin" && currentTab === "overview",
+        },
+        {
+          label: "Manage Users",
+          href: "/dashboard/admin?tab=users",
+          icon: Users,
+          active: pathname === "/dashboard/admin" && currentTab === "users",
+        },
+        {
+          label: "Menu Approvals",
+          href: "/dashboard/admin?tab=menu",
+          icon: Pizza,
+          active: pathname === "/dashboard/admin" && currentTab === "menu",
+        },
+        {
+          label: "Transaction Ledger",
+          href: "/dashboard/admin?tab=transactions",
+          icon: DollarSign,
+          active: pathname === "/dashboard/admin" && currentTab === "transactions",
         },
         {
           label: "Browse Menu",
           href: "/menu",
-          icon: Pizza,
+          icon: Store,
           active: pathname === "/menu",
         },
         {
@@ -102,13 +126,13 @@ export default function DashboardLayout({
         label: "Overview",
         href: "/dashboard/customer?tab=overview",
         icon: Store,
-        active: pathname === "/dashboard/customer",
+        active: pathname === "/dashboard/customer" && currentTab === "overview",
       },
       {
         label: "My Orders",
         href: "/dashboard/customer?tab=orders",
         icon: ShoppingBag,
-        active: false,
+        active: pathname === "/dashboard/customer" && currentTab === "orders",
       },
       {
         label: "Browse Menu",
@@ -133,174 +157,236 @@ export default function DashboardLayout({
   };
 
   return (
-    <ProtectedRoute>
-      <div className="min-h-screen bg-[#FAF8F5] flex flex-col md:flex-row">
-        {/* Mobile Header with Hamburger Toggle */}
-        <div className="md:hidden bg-white border-b border-stone-200 px-4 py-3 flex items-center justify-between sticky top-0 z-40">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="relative w-8 h-8 rounded-xl overflow-hidden shrink-0 shadow-xs border border-stone-200/60 bg-white">
-              <Image
-                src="/pizzahub-logo.webp"
-                alt="PizzaHub Logo"
-                fill
-                sizes="32px"
-                className="object-contain"
-                priority
-              />
-            </div>
-            <span className="font-extrabold text-stone-900 tracking-tight text-base">
-              Pizza<span className="text-[#D91E18]">Hub</span>
-            </span>
+    <div className="min-h-screen bg-[#FAF8F5] flex flex-col md:flex-row">
+      {/* Mobile & Tablet Top Bar (< md) */}
+      <div className="md:hidden bg-white border-b border-stone-200 px-4 py-3 flex items-center justify-between sticky top-0 z-40 shadow-2xs">
+        <Link href="/" className="flex items-center gap-2">
+          <div className="relative w-8 h-8 rounded-xl overflow-hidden shrink-0 shadow-xs border border-stone-200/60 bg-white">
+            <Image
+              src="/pizzahub-logo.webp"
+              alt="PizzaHub Logo"
+              fill
+              sizes="32px"
+              className="object-contain"
+              priority
+            />
+          </div>
+          <span className="font-extrabold text-stone-900 tracking-tight text-base">
+            Pizza<span className="text-[#D91E18]">Hub</span>
+          </span>
+        </Link>
+
+        {/* User Profile avatar quick link and hamburger toggle */}
+        <div className="flex items-center gap-2.5">
+          <Link
+            href="/profile/settings"
+            className="hover:opacity-85 transition-opacity"
+            title="Profile Settings"
+          >
+            <UserAvatar
+              src={user?.image}
+              name={user?.name}
+              size="sm"
+              isPremium={user?.subscriptionPlan === "premium"}
+            />
           </Link>
 
           <button
             type="button"
             onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
-            className="p-2 rounded-xl text-stone-600 hover:bg-stone-100"
-            aria-label="Toggle menu"
+            className="p-2 rounded-xl text-stone-600 hover:bg-stone-100 transition-colors"
+            aria-label="Toggle navigation drawer"
           >
             {mobileSidebarOpen ? <X className="w-5 h-5" /> : <MenuIcon className="w-5 h-5" />}
           </button>
         </div>
+      </div>
 
-        {/* Sidebar (Desktop Fixed & Mobile Drawer) */}
-        <aside
-          className={`fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-stone-200/90 flex flex-col justify-between transition-transform duration-300 md:translate-x-0 md:static md:z-auto ${
-            mobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
-          }`}
-        >
-          {/* Top Brand & Profile */}
-          <div className="p-6">
-            {/* Logo */}
-            <div className="flex items-center justify-between pb-6 border-b border-stone-100">
-              <Link href="/" className="flex items-center gap-2.5 group">
-                <div className="relative w-10 h-10 rounded-2xl overflow-hidden shrink-0 shadow-sm border border-stone-200/70 bg-white">
-                  <Image
-                    src="/pizzahub-logo.webp"
-                    alt="PizzaHub Logo"
-                    fill
-                    sizes="40px"
-                    className="object-contain"
-                    priority
-                  />
-                </div>
-                <div>
-                  <span className="font-black text-stone-900 text-lg tracking-tight block leading-tight">
-                    Pizza<span className="text-[#D91E18]">Hub</span>
-                  </span>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 block">
-                    Control Panel
-                  </span>
-                </div>
-              </Link>
-
-              <button
-                type="button"
-                onClick={() => setMobileSidebarOpen(false)}
-                className="md:hidden p-1.5 rounded-lg text-stone-400 hover:text-stone-700"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Logged-in User Profile Card */}
-            <div className="mt-5 p-3.5 rounded-2xl bg-stone-50 border border-stone-200/70">
-              <div className="flex items-center gap-3">
-                <UserAvatar
-                  src={user?.image}
-                  name={user?.name}
-                  size="md"
-                  isPremium={user?.subscriptionPlan === "premium"}
-                  className="border-stone-200 shadow-xs"
+      {/* Sidebar Navigation (Desktop Static Docked & Mobile Drawer) */}
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-stone-200/90 flex flex-col justify-between transition-transform duration-300 md:translate-x-0 md:static md:z-auto shrink-0 shadow-xs md:shadow-none ${
+          mobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        {/* Top Brand & User Profile Section */}
+        <div className="p-5 sm:p-6 overflow-y-auto">
+          {/* Logo */}
+          <div className="flex items-center justify-between pb-5 border-b border-stone-100">
+            <Link href="/" className="flex items-center gap-2.5 group">
+              <div className="relative w-10 h-10 rounded-2xl overflow-hidden shrink-0 shadow-sm border border-stone-200/70 bg-white">
+                <Image
+                  src="/pizzahub-logo.webp"
+                  alt="PizzaHub Logo"
+                  fill
+                  sizes="40px"
+                  className="object-contain"
+                  priority
                 />
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-bold text-stone-900 truncate">
-                    {user?.name || "Kitchen User"}
-                  </p>
-                  <p className="text-[11px] text-stone-500 truncate">{user?.email}</p>
-                </div>
               </div>
-
-              {/* Role & Subscription Badge */}
-              <div className="mt-2.5 pt-2.5 border-t border-stone-200/60 flex items-center justify-between">
-                <span className="text-[10px] uppercase font-black tracking-wider text-[#D91E18] bg-red-50 px-2 py-0.5 rounded-md border border-red-100">
-                  {user?.role || "Customer"}
+              <div>
+                <span className="font-black text-stone-900 text-lg tracking-tight block leading-tight">
+                  Pizza<span className="text-[#D91E18]">Hub</span>
                 </span>
-
-                {user?.role === "vendor" && (
-                  user?.subscriptionPlan === "premium" ? (
-                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-300">
-                      <Crown className="w-3 h-3 text-amber-500" />
-                      Premium
-                    </span>
-                  ) : (
-                    <span className="text-[10px] font-bold text-stone-500 bg-stone-100 px-2 py-0.5 rounded-md">
-                      Free Plan
-                    </span>
-                  )
-                )}
+                <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 block">
+                  Dashboard
+                </span>
               </div>
-            </div>
-
-            {/* Navigation Links */}
-            <nav className="mt-6 space-y-1.5">
-              <p className="text-[10px] font-extrabold text-stone-400 uppercase tracking-widest px-3 mb-2">
-                {user?.role?.toUpperCase()} MENU
-              </p>
-              {navLinks.map((link) => {
-                const Icon = link.icon;
-                return (
-                  <Link
-                    key={link.label}
-                    href={link.href}
-                    onClick={() => setMobileSidebarOpen(false)}
-                    className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold text-stone-700 hover:text-stone-900 hover:bg-stone-100/80 transition-all group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <Icon className="w-4 h-4 text-stone-500 group-hover:text-[#D91E18] transition-colors" />
-                      <span>{link.label}</span>
-                    </div>
-                    <ChevronRight className="w-3.5 h-3.5 text-stone-300 group-hover:text-stone-600 transition-colors" />
-                  </Link>
-                );
-              })}
-            </nav>
-          </div>
-
-          {/* Bottom Actions */}
-          <div className="p-6 border-t border-stone-100 space-y-2">
-            <Link
-              href="/"
-              className="flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-bold text-stone-600 hover:text-stone-900 hover:bg-stone-50 transition-colors"
-            >
-              <Home className="w-4 h-4 text-stone-400" />
-              <span>Back to Home</span>
             </Link>
 
             <button
               type="button"
-              onClick={handleSignOut}
-              className="w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-bold text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+              onClick={() => setMobileSidebarOpen(false)}
+              className="md:hidden p-1.5 rounded-lg text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors"
+              aria-label="Close menu"
             >
-              <LogOut className="w-4 h-4 text-red-500" />
-              <span>Sign Out</span>
+              <X className="w-5 h-5" />
             </button>
           </div>
-        </aside>
 
-        {/* Mobile Backdrop */}
-        {mobileSidebarOpen && (
-          <div
-            onClick={() => setMobileSidebarOpen(false)}
-            className="fixed inset-0 bg-stone-900/40 backdrop-blur-xs z-40 md:hidden"
-          />
-        )}
+          {/* User Profile Section (Avatar with Premium Gold Ring, Name, Email, Badges) */}
+          <div className="mt-5 p-3.5 rounded-2xl bg-stone-50 border border-stone-200/80 shadow-2xs">
+            <div className="flex items-center gap-3">
+              <UserAvatar
+                src={user?.image}
+                name={user?.name}
+                size="md"
+                isPremium={user?.subscriptionPlan === "premium"}
+                className="border-stone-200 shadow-xs"
+              />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-bold text-stone-900 truncate">
+                  {user?.name || "Kitchen User"}
+                </p>
+                <p className="text-[11px] text-stone-500 truncate">{user?.email}</p>
+              </div>
+            </div>
 
-        {/* Main Content Area */}
-        <main className="flex-1 min-w-0 overflow-y-auto">
-          {children}
-        </main>
-      </div>
+            {/* Role & Subscription Plan Indicators */}
+            <div className="mt-3 pt-2.5 border-t border-stone-200/70 flex items-center justify-between">
+              <span className="text-[10px] uppercase font-black tracking-wider text-[#D91E18] bg-red-50 px-2 py-0.5 rounded-md border border-red-200/70">
+                {user?.role || "Customer"}
+              </span>
+
+              {user?.role === "vendor" ? (
+                user?.subscriptionPlan === "premium" ? (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-300">
+                    <Crown className="w-3 h-3 text-amber-500 fill-amber-500" />
+                    Premium
+                  </span>
+                ) : (
+                  <span className="text-[10px] font-bold text-stone-500 bg-stone-100 px-2 py-0.5 rounded-md">
+                    Free Plan
+                  </span>
+                )
+              ) : (
+                <Link
+                  href="/profile/settings"
+                  className="text-[10px] font-bold text-stone-500 hover:text-[#D91E18] flex items-center gap-1 transition-colors"
+                >
+                  <Settings className="w-3 h-3" />
+                  <span>Settings</span>
+                </Link>
+              )}
+            </div>
+          </div>
+
+          {/* Role-Based Navigation Links */}
+          <nav className="mt-6 space-y-1">
+            <p className="text-[10px] font-black text-stone-400 uppercase tracking-widest px-3 mb-2">
+              {user?.role?.toUpperCase()} MENU
+            </p>
+            {navLinks.map((link) => {
+              const Icon = link.icon;
+              return (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  onClick={() => setMobileSidebarOpen(false)}
+                  className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all group ${
+                    link.active
+                      ? "bg-red-50 text-[#D91E18] shadow-2xs border-l-3 border-[#D91E18]"
+                      : "text-stone-700 hover:text-stone-900 hover:bg-stone-100/80"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon
+                      className={`w-4 h-4 transition-colors ${
+                        link.active
+                          ? "text-[#D91E18]"
+                          : "text-stone-500 group-hover:text-[#D91E18]"
+                      }`}
+                    />
+                    <span>{link.label}</span>
+                  </div>
+                  <ChevronRight
+                    className={`w-3.5 h-3.5 transition-colors ${
+                      link.active
+                        ? "text-[#D91E18]"
+                        : "text-stone-300 group-hover:text-stone-600"
+                    }`}
+                  />
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* Bottom Actions */}
+        <div className="p-5 sm:p-6 border-t border-stone-100 space-y-1.5 shrink-0">
+          <Link
+            href="/"
+            className="flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-bold text-stone-600 hover:text-stone-900 hover:bg-stone-50 transition-colors"
+          >
+            <Home className="w-4 h-4 text-stone-400" />
+            <span>Back to Home</span>
+          </Link>
+
+          <button
+            type="button"
+            onClick={handleSignOut}
+            className="w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-bold text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+          >
+            <LogOut className="w-4 h-4 text-red-500" />
+            <span>Sign Out</span>
+          </button>
+        </div>
+      </aside>
+
+      {/* Mobile Backdrop */}
+      {mobileSidebarOpen && (
+        <div
+          onClick={() => setMobileSidebarOpen(false)}
+          className="fixed inset-0 bg-stone-900/40 backdrop-blur-xs z-40 md:hidden"
+        />
+      )}
+
+      {/* Full-Width Main Content Area */}
+      <main className="flex-1 min-w-0 overflow-y-auto">
+        {children}
+      </main>
+    </div>
+  );
+}
+
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <ProtectedRoute>
+      <Suspense
+        fallback={
+          <div className="min-h-screen bg-[#FAF8F5] flex items-center justify-center p-8">
+            <div className="text-center">
+              <div className="w-8 h-8 border-3 border-[#D91E18] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+              <p className="text-xs font-bold text-stone-500">Loading Dashboard...</p>
+            </div>
+          </div>
+        }
+      >
+        <DashboardLayoutContent>{children}</DashboardLayoutContent>
+      </Suspense>
     </ProtectedRoute>
   );
 }

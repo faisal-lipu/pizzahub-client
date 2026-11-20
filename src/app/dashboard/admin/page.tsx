@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, Suspense } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { useAuth } from "@/context/AuthContext";
 import { apiRequest } from "@/lib/api";
@@ -9,6 +10,9 @@ import { toast } from "sonner";
 import ConfirmModal from "@/components/ConfirmModal";
 import PizzaImage from "@/components/PizzaImage";
 import UserAvatar from "@/components/UserAvatar";
+import DonutChart from "@/components/dashboard/DonutChart";
+import BarChart from "@/components/dashboard/BarChart";
+import TrendChart from "@/components/dashboard/TrendChart";
 import {
   ShieldAlert,
   Users,
@@ -104,7 +108,24 @@ const CATEGORIES = [
 
 function AdminDashboardContent() {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<"overview" | "users" | "menu" | "transactions">("overview");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get("tab") as "overview" | "users" | "menu" | "transactions" | null;
+
+  const [activeTab, setActiveTab] = useState<"overview" | "users" | "menu" | "transactions">(
+    tabParam || "overview"
+  );
+
+  useEffect(() => {
+    if (tabParam && ["overview", "users", "menu", "transactions"].includes(tabParam)) {
+      setActiveTab(tabParam);
+    }
+  }, [tabParam]);
+
+  const handleTabChange = (newTab: "overview" | "users" | "menu" | "transactions") => {
+    setActiveTab(newTab);
+    router.replace(`/dashboard/admin?tab=${newTab}`);
+  };
 
   const [usersList, setUsersList] = useState<AdminUser[]>([]);
   const [menuList, setMenuList] = useState<AdminMenuItem[]>([]);
@@ -269,6 +290,74 @@ function AdminDashboardContent() {
   const totalTransactions = transactionsList.length;
   const totalRevenue = transactionsList.reduce((sum, tx) => sum + (tx.amount || 0), 0);
 
+  // Chart Data: User Role Breakdown
+  const userRoleChartData = useMemo(() => [
+    { label: "Customers", value: totalCustomers, color: "#4F46E5" },
+    { label: "Vendors", value: totalVendors, color: "#F59E0B" },
+    { label: "Admins", value: Math.max(usersList.filter((u) => u.role === "admin").length, 1), color: "#D91E18" },
+  ], [totalCustomers, totalVendors, usersList]);
+
+  // Chart Data: Menu Status Breakdown
+  const menuStatusChartData = useMemo(() => [
+    { label: "Approved", value: menuList.filter((m) => m.status === "approved").length, color: "#10B981" },
+    { label: "Pending", value: pendingMenuItems, color: "#F59E0B" },
+    { label: "Rejected", value: menuList.filter((m) => m.status === "rejected").length, color: "#EF4444" },
+    { label: "Inactive", value: menuList.filter((m) => m.status === "inactive").length, color: "#9CA3AF" },
+  ], [menuList, pendingMenuItems]);
+
+  // Chart Data: Menu Items by Category
+  const menuCategoryChartData = useMemo(() => {
+    const counts: Record<string, number> = {
+      "Classic": 0,
+      "Meat": 0,
+      "Vegetarian": 0,
+      "Specialty": 0,
+      "Sides": 0,
+      "Beverages": 0,
+    };
+    menuList.forEach((m) => {
+      const cat = m.category || "";
+      if (cat.includes("Classic")) counts["Classic"] += 1;
+      else if (cat.includes("Meat")) counts["Meat"] += 1;
+      else if (cat.includes("Veg")) counts["Vegetarian"] += 1;
+      else if (cat.includes("Special")) counts["Specialty"] += 1;
+      else if (cat.includes("Side")) counts["Sides"] += 1;
+      else if (cat.includes("Bev") || cat.includes("Dessert")) counts["Beverages"] += 1;
+      else counts["Classic"] += 1;
+    });
+
+    return [
+      { label: "Classic Pizzas", value: counts["Classic"], color: "#EA580C" },
+      { label: "Meat Lovers", value: counts["Meat"], color: "#DC2626" },
+      { label: "Vegetarian", value: counts["Vegetarian"], color: "#16A34A" },
+      { label: "Specialty / Gourmet", value: counts["Specialty"], color: "#D97706" },
+      { label: "Sides & Appetizers", value: counts["Sides"], color: "#0284C7" },
+      { label: "Beverages", value: counts["Beverages"], color: "#9333EA" },
+    ];
+  }, [menuList]);
+
+  // Chart Data: Transaction Activity Trend
+  const transactionTrendChartData = useMemo(() => {
+    if (transactionsList.length === 0) {
+      return [
+        { label: "Wk 1", value: 0, formattedValue: "$0" },
+        { label: "Wk 2", value: 0, formattedValue: "$0" },
+        { label: "Wk 3", value: 0, formattedValue: "$0" },
+        { label: "Wk 4", value: 0, formattedValue: "$0" },
+      ];
+    }
+    const points = transactionsList.slice(-6).map((tx, idx) => ({
+      label: tx.createdAt
+        ? new Date(tx.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+        : `Tx ${idx + 1}`,
+      value: Number(tx.amount) || 19.99,
+      formattedValue: `$${(Number(tx.amount) || 19.99).toFixed(2)}`,
+    }));
+    return points.length >= 2
+      ? points
+      : [{ label: "Start", value: 0, formattedValue: "$0" }, ...points];
+  }, [transactionsList]);
+
   // Filtered Users List
   const filteredUsers = useMemo(() => {
     return usersList.filter((u) => {
@@ -359,7 +448,7 @@ function AdminDashboardContent() {
             <button
               key={tab.id}
               type="button"
-              onClick={() => setActiveTab(tab.id as typeof activeTab)}
+              onClick={() => handleTabChange(tab.id as typeof activeTab)}
               className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
                 isActive
                   ? "bg-stone-900 text-white shadow-md shadow-stone-900/10"
@@ -560,12 +649,62 @@ function AdminDashboardContent() {
                 <span>Active Users: <strong>{usersList.filter((u) => !u.isBlocked).length}</strong></span>
                 <button
                   type="button"
-                  onClick={() => setActiveTab("users")}
+                  onClick={() => handleTabChange("users")}
                   className="font-bold text-[#D91E18] hover:underline cursor-pointer"
                 >
                   Manage User Directory &rarr;
                 </button>
               </div>
+            </div>
+          </div>
+
+          {/* Interactive Data Visualization Charts & Graphs */}
+          <div className="space-y-4 pt-2">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-black text-stone-900">Platform Analytics & Visualizations</h2>
+                <p className="text-xs text-stone-500 font-medium">Interactive charts and graphs for instant data insights</p>
+              </div>
+              <span className="text-xs font-bold text-stone-400 bg-stone-100 px-3 py-1 rounded-full">
+                Real-Time Data
+              </span>
+            </div>
+
+            {/* Row 1: Donut Charts (User Distribution & Menu Status) */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <DonutChart
+                title="User Ecosystem Breakdown"
+                subtitle="Distribution of registered platform accounts by role"
+                data={userRoleChartData}
+                centerLabel="Total Users"
+                centerValue={totalRegisteredUsers}
+              />
+
+              <DonutChart
+                title="Menu Approval Pipeline"
+                subtitle="Verification state of all submitted menu recipes"
+                data={menuStatusChartData}
+                centerLabel="Total Items"
+                centerValue={totalMenuItems}
+              />
+            </div>
+
+            {/* Row 2: Bar & Trend Charts */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <BarChart
+                title="Menu Catalog by Category"
+                subtitle="Distribution of items across specialized culinary categories"
+                data={menuCategoryChartData}
+                horizontal
+              />
+
+              <TrendChart
+                title="Subscription Revenue Trajectory"
+                subtitle="Live progression from vendor Premium tier activations ($19.99/mo)"
+                data={transactionTrendChartData}
+                valuePrefix="$"
+                lineColor="#D91E18"
+              />
             </div>
           </div>
         </div>
@@ -1246,7 +1385,18 @@ function AdminDashboardContent() {
 export default function AdminDashboardPage() {
   return (
     <ProtectedRoute allowedRoles={["admin"]}>
-      <AdminDashboardContent />
+      <Suspense
+        fallback={
+          <div className="min-h-screen bg-[#FAF8F5] flex items-center justify-center p-8">
+            <div className="text-center">
+              <div className="w-8 h-8 border-3 border-[#D91E18] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+              <p className="text-xs font-bold text-stone-500">Loading Admin Master Console...</p>
+            </div>
+          </div>
+        }
+      >
+        <AdminDashboardContent />
+      </Suspense>
     </ProtectedRoute>
   );
 }
