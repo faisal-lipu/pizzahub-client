@@ -29,10 +29,10 @@ export default function RootLayout({
       lang="en"
       className={`${montserrat.variable} h-full antialiased`}
     >
-      <body className={`${montserrat.className} min-h-full flex flex-col bg-stone-50 text-stone-900 font-sans`}>
+      <body className={`${montserrat.className} min-h-full flex flex-col bg-stone-50 text-stone-900 font-sans overflow-x-hidden w-full max-w-full`}>
         <AuthProvider>
           <Navbar />
-          <main className="flex-1">{children}</main>
+          <main className="flex-1 w-full max-w-full overflow-x-hidden">{children}</main>
           <Footer />
           <Toaster richColors position="top-right" />
         </AuthProvider>

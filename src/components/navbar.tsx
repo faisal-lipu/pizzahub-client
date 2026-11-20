@@ -86,12 +86,12 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full py-4 px-4 sm:px-6 lg:px-8">
-        <nav className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-          {/* ========================================================
-              LEFT PILL: Main Navigation
-              Wide white pill container with Logo & Links
-             ======================================================== */}
+      <header className="sticky top-0 z-50 w-full py-3 sm:py-4 px-3 sm:px-6 lg:px-8 max-w-full overflow-hidden">
+        {/* ========================================================
+            DESKTOP NAVBAR (md and above): Floating Split-Pill Design
+           ======================================================== */}
+        <nav className="hidden md:flex items-center justify-between gap-4 max-w-7xl mx-auto w-full">
+          {/* LEFT PILL: Main Navigation */}
           <div className="bg-white rounded-3xl shadow-sm border border-gray-100 px-6 sm:px-8 py-2 flex items-center justify-between flex-1 max-w-4xl transition-all">
             {/* Brand Logo */}
             <Link
@@ -115,7 +115,7 @@ export default function Navbar() {
             </Link>
 
             {/* Desktop Navigation Links */}
-            <div className="hidden md:flex items-center gap-8">
+            <div className="flex items-center gap-8">
               {navLinks.map((item) => {
                 const isActive =
                   item.href === "/"
@@ -151,24 +151,9 @@ export default function Navbar() {
                 </Link>
               )}
             </div>
-
-            {/* Mobile Menu Toggle Button (Inside Left Pill on Mobile) */}
-            <div className="md:hidden flex items-center">
-              <button
-                type="button"
-                onClick={() => setMobileMenuOpen((prev) => !prev)}
-                className="p-1.5 rounded-full text-[#1F2937] hover:text-[#D91E18] hover:bg-gray-100 transition-colors"
-                aria-label="Toggle navigation menu"
-              >
-                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-              </button>
-            </div>
           </div>
 
-          {/* ========================================================
-              RIGHT PILL: Action Bar
-              Compact white pill container with Search, Divider, Profile, CTA
-             ======================================================== */}
+          {/* RIGHT PILL: Action Bar */}
           <div className="bg-white rounded-3xl shadow-sm border border-gray-100 px-4 py-2 flex items-center gap-4 transition-all flex-shrink-0">
             {/* 1. Search Icon */}
             <button
@@ -226,7 +211,6 @@ export default function Navbar() {
                         </span>
                       </div>
 
-                      {/* Tablet-pill: Premium Account Indicator */}
                       {user.subscriptionPlan === "premium" && (
                         <div className="shrink-0 mt-1">
                           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 text-white text-[11px] font-black shadow-xs shadow-amber-500/25 border border-amber-300/50 whitespace-nowrap">
@@ -278,7 +262,7 @@ export default function Navbar() {
             {isAuthenticated && user ? (
               <Link
                 href={getDashboardHref()}
-                className="hidden sm:inline-block bg-[#D91E18] hover:bg-[#B91C1C] text-white font-semibold px-5 py-2 rounded-full transition-colors text-sm shadow-sm"
+                className="bg-[#D91E18] hover:bg-[#B91C1C] text-white font-semibold px-5 py-2 rounded-full transition-colors text-sm shadow-sm"
               >
                 Dashboard
               </Link>
@@ -292,6 +276,79 @@ export default function Navbar() {
             )}
           </div>
         </nav>
+
+        {/* ========================================================
+            MOBILE NAVBAR (< md): Unified Single Floating Pill
+            100% width, zero horizontal overflow, centered on screen
+           ======================================================== */}
+        <div className="md:hidden bg-white rounded-2xl shadow-sm border border-stone-200/90 px-3.5 py-2 flex items-center justify-between w-full max-w-full">
+          {/* Brand Logo & Name */}
+          <Link
+            href="/"
+            className="flex items-center gap-2 group shrink-0"
+            aria-label="PizzaHub Home"
+          >
+            <div className="relative w-8 h-8 rounded-full overflow-hidden shrink-0">
+              <Image
+                src="/pizzahub-logo.webp"
+                alt="PizzaHub Logo"
+                fill
+                sizes="32px"
+                className="object-contain"
+                priority
+              />
+            </div>
+            <span className="text-xl font-black tracking-tight text-stone-900">
+              Pizza<span className="text-[#D91E18]">Hub</span>
+            </span>
+          </Link>
+
+          {/* Action Icons Cluster: Search, User / Sign In, Hamburger */}
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            {/* Search Icon */}
+            <button
+              type="button"
+              onClick={() => setSearchModalOpen(true)}
+              className="p-1.5 rounded-full text-stone-600 hover:text-[#D91E18] hover:bg-stone-100 transition-colors cursor-pointer"
+              aria-label="Search pizza menu"
+            >
+              <Search className="w-5 h-5 stroke-[2.2]" />
+            </button>
+
+            {/* User Profile or Sign In Link */}
+            {isAuthenticated && user ? (
+              <Link
+                href={getDashboardHref()}
+                className="p-0.5 rounded-full hover:scale-105 transition-transform"
+                title="Open Dashboard"
+              >
+                <UserAvatar
+                  src={user.image}
+                  name={userName}
+                  size="sm"
+                  isPremium={user.subscriptionPlan === "premium"}
+                />
+              </Link>
+            ) : (
+              <Link
+                href="/sign-in"
+                className="text-xs font-bold text-[#D91E18] bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-full border border-red-100 transition-colors"
+              >
+                Sign In
+              </Link>
+            )}
+
+            {/* Hamburger Menu Toggle Button */}
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen((prev) => !prev)}
+              className="p-1.5 rounded-full text-stone-700 hover:text-[#D91E18] hover:bg-stone-100 transition-colors cursor-pointer"
+              aria-label="Toggle navigation menu"
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
+        </div>
 
         {/* ========================================================
             Mobile Slide-down Navigation Menu
