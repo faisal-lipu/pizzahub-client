@@ -26,6 +26,8 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { apiRequest } from "@/lib/api";
 import PizzaImage from "@/components/PizzaImage";
+import { useAuth } from "@/context/AuthContext";
+import { toast } from "sonner";
 
 interface MenuItem {
   _id: string;
@@ -264,10 +266,20 @@ const TESTIMONIALS = [
  */
 export default function HomePage() {
   const router = useRouter();
+  const { user } = useAuth();
   const [featuredPizzas, setFeaturedPizzas] = useState<MenuItem[]>(DEFAULT_FEATURED_PIZZAS);
   const [activeCategory, setActiveCategory] = useState("all");
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
   const [videoModalOpen, setVideoModalOpen] = useState(false);
+
+  const handleViewDetails = (pizzaId: string) => {
+    if (!user) {
+      toast.info("Please sign in to view item details and order.");
+      router.push(`/sign-in?redirect=${encodeURIComponent(`/menu/${pizzaId}`)}`);
+    } else {
+      router.push(`/menu/${pizzaId}`);
+    }
+  };
 
   // Fetch live menu items from backend API
   useEffect(() => {
@@ -596,14 +608,15 @@ export default function HomePage() {
                       </span>
                     </div>
 
-                    {/* 7. View Details Link */}
-                    <Link
-                      href={`/menu/${pizza._id}`}
+                    {/* 7. View Details Button (redirects to Sign In if logged out) */}
+                    <button
+                      type="button"
+                      onClick={() => handleViewDetails(pizza._id)}
                       className="inline-flex items-center gap-1.5 bg-[#D91E18] hover:bg-[#B91C1C] text-white font-bold text-xs px-4 py-2 rounded-full shadow-sm shadow-red-500/20 transition-all transform hover:-translate-y-0.5 cursor-pointer"
                     >
                       <span>View Details</span>
                       <ArrowRight className="w-3.5 h-3.5" />
-                    </Link>
+                    </button>
                   </div>
                 </div>
               </motion.div>

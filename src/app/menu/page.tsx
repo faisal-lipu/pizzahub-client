@@ -3,9 +3,11 @@
 import React, { useState, useEffect, Suspense } from "react";
 import PizzaImage from "@/components/PizzaImage";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Search, Filter, ArrowUpDown, Star, Heart, Loader2, MapPin, Store, ArrowRight } from "lucide-react";
 import { apiRequest } from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
+import { toast } from "sonner";
 
 interface MenuItem {
   _id: string;
@@ -30,6 +32,17 @@ const CATEGORIES = [
   "Specialty / Gourmet Pizzas",
   "Sides & Appetizers",
   "Beverages & Desserts",
+];
+
+// Locations for filtering per Assignment 9 requirements
+const LOCATIONS = [
+  "All Locations",
+  "Little Italy, New York",
+  "SoHo, Manhattan",
+  "Williamsburg, Brooklyn",
+  "Greenwich Village, NY",
+  "Upper East Side, NY",
+  "DUMBO, Brooklyn",
 ];
 
 // Fallback pizzas for demo state covering all categories
@@ -136,15 +149,19 @@ const FALLBACK_MENU: MenuItem[] = [
  * Menu View Component inside Suspense Boundary
  */
 function MenuContent() {
+  const router = useRouter();
+  const { user } = useAuth();
   const searchParams = useSearchParams();
   const paramCategory = searchParams.get("category");
   const initialCategory = paramCategory || "All";
   const initialSearch = searchParams.get("search") || "";
+  const initialLocation = searchParams.get("location") || "All";
 
   const [items, setItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState(initialSearch);
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
+  const [selectedLocation, setSelectedLocation] = useState(initialLocation);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | "none">("none");
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
 
@@ -162,6 +179,7 @@ function MenuContent() {
         const queryParams = new URLSearchParams();
         if (search.trim()) queryParams.set("search", search.trim());
         if (selectedCategory && selectedCategory !== "All") queryParams.set("category", selectedCategory);
+        if (selectedLocation && selectedLocation !== "All") queryParams.set("location", selectedLocation);
         if (sortOrder !== "none") {
           queryParams.set("sortBy", "price");
           queryParams.set("order", sortOrder);
@@ -190,7 +208,7 @@ function MenuContent() {
             isPremiumVendor: raw.vendor?.subscriptionPlan === "premium",
           }));
           setItems(mappedItems);
-        } else if (search.trim() || (selectedCategory && selectedCategory !== "All")) {
+        } else if (search.trim() || (selectedCategory && selectedCategory !== "All") || (selectedLocation && selectedLocation !== "All")) {
           // Empty result for specific search/filter query
           setItems([]);
         } else {
@@ -209,6 +227,9 @@ function MenuContent() {
         if (selectedCategory && selectedCategory !== "All") {
           filtered = filtered.filter(i => i.category.toLowerCase() === selectedCategory.toLowerCase());
         }
+        if (selectedLocation && selectedLocation !== "All") {
+          filtered = filtered.filter(i => (i.location || "").toLowerCase().includes(selectedLocation.toLowerCase()));
+        }
         if (search.trim()) {
           filtered = filtered.filter(i => i.name.toLowerCase().includes(search.toLowerCase()) || i.description.toLowerCase().includes(search.toLowerCase()));
         }
@@ -223,12 +244,21 @@ function MenuContent() {
     }, 250);
 
     return () => clearTimeout(timer);
-  }, [search, selectedCategory, sortOrder]);
+  }, [search, selectedCategory, selectedLocation, sortOrder]);
 
   const toggleFavorite = (id: string, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setFavorites((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const handleViewDetails = (pizzaId: string) => {
+    if (!user) {
+      toast.info("Please sign in to view item details and order.");
+      router.push(`/sign-in?redirect=${encodeURIComponent(`/menu/${pizzaId}`)}`);
+    } else {
+      router.push(`/menu/${pizzaId}`);
+    }
   };
 
   return (
@@ -248,7 +278,7 @@ function MenuContent() {
 
       {/* Search & Filter Bar */}
       <div className="bg-white rounded-3xl p-4 sm:p-5 border border-stone-200/80 shadow-xs mb-8 space-y-4">
-        <div className="flex flex-col sm:flex-row gap-3">
+        <div className="flex flex-col md:flex-row gap-3">
           {/* Live Search Input */}
           <div className="relative flex-1">
             <input
@@ -261,8 +291,24 @@ function MenuContent() {
             <Search className="w-5 h-5 text-stone-400 absolute left-3.5 top-3.5" />
           </div>
 
-          {/* Sort By Price Dropdown (Challenge #1 from Backend) */}
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            {/* Filter by Location Dropdown */}
+            <div className="relative w-full sm:w-56">
+              <select
+                value={selectedLocation}
+                onChange={(e) => setSelectedLocation(e.target.value)}
+                className="w-full pl-9 pr-8 py-3 rounded-2xl bg-stone-50 border border-stone-200 text-xs sm:text-sm font-semibold text-stone-700 appearance-none focus:outline-none focus:border-[#D91E18] cursor-pointer"
+              >
+                {LOCATIONS.map((loc) => (
+                  <option key={loc} value={loc}>
+                    {loc}
+                  </option>
+                ))}
+              </select>
+              <MapPin className="w-4 h-4 text-stone-400 absolute left-3 top-3.5 pointer-events-none" />
+            </div>
+
+            {/* Sort By Price Dropdown (Challenge #1 from Backend) */}
             <div className="relative w-full sm:w-48">
               <select
                 value={sortOrder}
@@ -313,16 +359,17 @@ function MenuContent() {
           <p className="text-4xl mb-3">🍕</p>
           <h3 className="text-lg font-bold text-stone-800">No Pizzas Found</h3>
           <p className="text-xs text-stone-500 mt-1 max-w-sm mx-auto">
-            We could not find any pizza matching &ldquo;{search}&rdquo;. Try another keyword or reset the category filter.
+            We could not find any pizza matching your filters. Try another search or reset the filters.
           </p>
           <button
             type="button"
             onClick={() => {
               setSearch("");
               setSelectedCategory("All");
+              setSelectedLocation("All");
               setSortOrder("none");
             }}
-            className="mt-5 px-5 py-2.5 rounded-full bg-[#D91E18] text-white text-xs font-bold shadow-sm hover:bg-[#B91C1C]"
+            className="mt-5 px-5 py-2.5 rounded-full bg-[#D91E18] text-white text-xs font-bold shadow-sm hover:bg-[#B91C1C] cursor-pointer"
           >
             Reset Filters
           </button>
@@ -418,14 +465,15 @@ function MenuContent() {
                       </span>
                     </div>
 
-                    {/* Links to Protected Item Details Page */}
-                    <Link
-                      href={`/menu/${pizza._id}`}
-                      className="inline-flex items-center gap-1.5 bg-[#D91E18] hover:bg-[#B91C1C] text-white font-bold text-xs px-4 py-2 rounded-full transition-all transform hover:-translate-y-0.5 shadow-sm shadow-red-500/20"
+                    {/* Links to Protected Item Details Page (redirects to Sign In if logged out) */}
+                    <button
+                      type="button"
+                      onClick={() => handleViewDetails(pizza._id)}
+                      className="inline-flex items-center gap-1.5 bg-[#D91E18] hover:bg-[#B91C1C] text-white font-bold text-xs px-4 py-2 rounded-full transition-all transform hover:-translate-y-0.5 shadow-sm shadow-red-500/20 cursor-pointer"
                     >
                       <span>View Details</span>
                       <ArrowRight className="w-3.5 h-3.5" />
-                    </Link>
+                    </button>
                   </div>
                 </div>
               </div>
