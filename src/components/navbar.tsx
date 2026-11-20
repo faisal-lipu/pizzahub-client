@@ -347,7 +347,7 @@ export default function Navbar() {
                       </Link>
                     </div>
 
-                    {/* Logout Action */}
+                    {/* Sign Out Action */}
                     <div className="py-1">
                       <button
                         type="button"
@@ -355,7 +355,7 @@ export default function Navbar() {
                         className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#D91E18] hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors text-left font-bold cursor-pointer"
                       >
                         <LogOut className="w-4 h-4 text-[#D91E18]" />
-                        <span>Logout</span>
+                        <span>Sign Out</span>
                       </button>
                     </div>
                   </div>
@@ -570,7 +570,7 @@ export default function Navbar() {
                     className="w-full flex items-center gap-2.5 px-4 py-2 rounded-xl text-sm font-bold text-[#D91E18] hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors"
                   >
                     <LogOut className="w-4 h-4 text-[#D91E18]" />
-                    <span>Logout</span>
+                    <span>Sign Out</span>
                   </button>
                 </div>
               ) : (
