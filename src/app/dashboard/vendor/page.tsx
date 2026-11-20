@@ -81,7 +81,7 @@ const CATEGORIES = [
 ];
 
 function VendorDashboardInner() {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab") as "overview" | "menu" | "add" | "orders" | "subscription" | null;
 
@@ -137,6 +137,7 @@ function VendorDashboardInner() {
   // Action / Confirmation states
   const [actionInProgress, setActionInProgress] = useState<string | null>(null);
   const [deleteConfirmItem, setDeleteConfirmItem] = useState<{ id: string; name: string } | null>(null);
+  const [showCancelModal, setShowCancelModal] = useState(false);
 
   const fetchVendorData = async () => {
     try {
@@ -165,8 +166,17 @@ function VendorDashboardInner() {
         }>;
       }>("/api/payment/subscription-status").catch(() => null);
 
-      if (subRes?.success && subRes.transactions) {
-        setSubscriptionTransactions(subRes.transactions);
+      if (subRes?.success) {
+        if (subRes.transactions) {
+          setSubscriptionTransactions(subRes.transactions);
+        }
+        if (updateUser && user && subRes.subscriptionPlan !== user.subscriptionPlan) {
+          updateUser({
+            ...user,
+            subscriptionPlan: subRes.subscriptionPlan,
+            subscriptionExpiresAt: subRes.subscriptionExpiresAt,
+          });
+        }
       }
     } catch (err) {
       console.warn("[Vendor Dashboard] Load error:", err);
@@ -468,6 +478,33 @@ function VendorDashboardInner() {
     } catch (err: unknown) {
       const errorMsg = err instanceof Error ? err.message : "Failed to process upgrade.";
       toast.error(errorMsg);
+    } finally {
+      setActionInProgress(null);
+    }
+  };
+
+  // Handle Subscription Cancellation (Requirement 5)
+  const handleCancelSubscription = async () => {
+    try {
+      setActionInProgress("cancel-subscription");
+      const res = await apiRequest<{ success: boolean; message: string; subscriptionPlan: "free" | "premium" }>(
+        "/api/payment/cancel-subscription",
+        { method: "POST" }
+      );
+      toast.success(res.message || "Subscription cancelled. Reverted to Free tier.");
+      setShowCancelModal(false);
+      await fetchVendorData();
+      if (updateUser && user) {
+        updateUser({
+          ...user,
+          subscriptionPlan: "free",
+          subscriptionExpiresAt: null,
+          subscriptionStatus: "cancelled",
+        });
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to cancel subscription.";
+      toast.error(msg);
     } finally {
       setActionInProgress(null);
     }
@@ -1151,13 +1188,25 @@ function VendorDashboardInner() {
                   </div>
                   <p className="text-xs text-stone-300 mt-0.5">
                     You have unlocked unlimited menu items, verified chef badge, and featured homepage showcase.
+                    {user?.subscriptionExpiresAt && (
+                      <span className="block text-[11px] text-amber-300/90 font-medium mt-0.5">
+                        • Renews / Valid until: {new Date(user.subscriptionExpiresAt).toLocaleDateString()}
+                      </span>
+                    )}
                   </p>
                 </div>
               </div>
-              <div className="shrink-0">
+              <div className="shrink-0 flex items-center gap-2">
                 <span className="text-xs font-bold text-amber-300 bg-amber-950/60 px-3 py-1.5 rounded-full border border-amber-500/30">
-                  $19.99/mo (Auto-renewing)
+                  $19.99/mo
                 </span>
+                <button
+                  type="button"
+                  onClick={() => setShowCancelModal(true)}
+                  className="px-3.5 py-1.5 text-xs font-bold text-stone-300 hover:text-red-400 border border-stone-700 hover:border-red-500/50 rounded-full transition-colors cursor-pointer"
+                >
+                  Cancel Plan
+                </button>
               </div>
             </div>
           )}
@@ -1214,7 +1263,7 @@ function VendorDashboardInner() {
                   <td className="py-5 px-6 text-right w-48 whitespace-nowrap">
                     {!isFreePlan ? (
                       /* Ultra-Premium Luxury Active Plan Badge */
-                      <div className="flex justify-end">
+                      <div className="flex flex-col items-end gap-1.5">
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-stone-950 via-stone-800 to-black text-white text-xs font-black shadow-lg shadow-stone-900/20 border border-amber-400/60 whitespace-nowrap">
                           <span className="relative flex h-2.5 w-2.5 shrink-0">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -1225,6 +1274,13 @@ function VendorDashboardInner() {
                             Active Plan
                           </span>
                         </div>
+                        <button
+                          type="button"
+                          onClick={() => setShowCancelModal(true)}
+                          className="text-[11px] font-semibold text-stone-500 hover:text-red-600 underline cursor-pointer transition-colors"
+                        >
+                          Cancel Plan
+                        </button>
                       </div>
                     ) : (
                       <div className="flex justify-end">
@@ -1497,6 +1553,22 @@ function VendorDashboardInner() {
           variant="danger"
           onConfirm={handleConfirmDelete}
           onCancel={() => setDeleteConfirmItem(null)}
+        />
+      )}
+
+      {/* ========================================================
+          MODAL 4: CANCEL SUBSCRIPTION CONFIRMATION MODAL
+         ======================================================== */}
+      {showCancelModal && (
+        <ConfirmModal
+          isOpen={showCancelModal}
+          title="Cancel Premium Subscription"
+          message="Are you sure you want to cancel your Premium vendor subscription? Your account will revert to the Free tier with a maximum limit of 3 menu items."
+          confirmText={actionInProgress === "cancel-subscription" ? "Cancelling..." : "Yes, Cancel Subscription"}
+          cancelText="Keep Subscription"
+          variant="danger"
+          onConfirm={handleCancelSubscription}
+          onCancel={() => setShowCancelModal(false)}
         />
       )}
     </div>

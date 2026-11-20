@@ -12,6 +12,8 @@ export interface User {
   image?: string | null;
   businessName?: string | null;
   subscriptionPlan?: "free" | "premium";
+  subscriptionExpiresAt?: string | null;
+  subscriptionStatus?: string;
   isBlocked?: boolean;
 }
 

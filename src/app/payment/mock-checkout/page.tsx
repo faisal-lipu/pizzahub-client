@@ -6,6 +6,8 @@ import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { useAuth } from "@/context/AuthContext";
+import { apiRequest } from "@/lib/api";
+import { toast } from "sonner";
 import {
   CreditCard,
   ShieldCheck,
@@ -25,11 +27,19 @@ function MockCheckoutContent() {
 
   const [processing, setProcessing] = useState(false);
 
-  const handlePay = () => {
-    setProcessing(true);
-    setTimeout(() => {
+  const handlePay = async () => {
+    try {
+      setProcessing(true);
+      await apiRequest("/api/payment/mock-confirm-payment", {
+        method: "POST",
+        data: { sessionId },
+      });
       router.push(`/payment/success?session_id=${encodeURIComponent(sessionId)}`);
-    }, 1200);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to confirm payment.";
+      toast.error(msg);
+      setProcessing(false);
+    }
   };
 
   return (
