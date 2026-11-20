@@ -14,8 +14,10 @@ import {
   Menu,
   X,
   Crown,
+  Heart,
 } from "lucide-react";
 import UserAvatar from "./UserAvatar";
+import { getFavoriteItems } from "@/lib/favorites";
 
 
 /**
@@ -34,6 +36,14 @@ export default function Navbar() {
   const [searchModalOpen, setSearchModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [favCount, setFavCount] = useState(0);
+
+  useEffect(() => {
+    setFavCount(getFavoriteItems().length);
+    const onSync = () => setFavCount(getFavoriteItems().length);
+    window.addEventListener("pizzahub_favorites_updated", onSync);
+    return () => window.removeEventListener("pizzahub_favorites_updated", onSync);
+  }, []);
 
   const profileRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -78,6 +88,7 @@ export default function Navbar() {
   const navLinks = [
     { label: "Home", href: "/" },
     { label: "Browse Menu", href: "/menu" },
+    { label: "Wishlist", href: "/wishlist" },
     { label: "About", href: "/about" },
     { label: "Contact", href: "/contact" },
   ];
@@ -154,7 +165,7 @@ export default function Navbar() {
           </div>
 
           {/* RIGHT PILL: Action Bar */}
-          <div className="bg-white rounded-3xl shadow-sm border border-gray-100 px-4 py-2 flex items-center gap-4 transition-all flex-shrink-0">
+          <div className="bg-white rounded-3xl shadow-sm border border-gray-100 px-4 py-2 flex items-center gap-3.5 transition-all flex-shrink-0">
             {/* 1. Search Icon */}
             <button
               type="button"
@@ -164,6 +175,21 @@ export default function Navbar() {
             >
               <Search className="w-5 h-5 stroke-[2.2]" />
             </button>
+
+            {/* 1.5. Wishlist Icon with Live Badge */}
+            <Link
+              href="/wishlist"
+              className="relative text-[#4A1515] hover:text-[#D91E18] hover:scale-110 transition-transform p-1 cursor-pointer focus:outline-none"
+              title="My Wishlist"
+              aria-label="View Wishlist"
+            >
+              <Heart className={`w-5 h-5 stroke-[2.2] ${favCount > 0 ? "fill-[#D91E18] text-[#D91E18]" : ""}`} />
+              {favCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 bg-[#D91E18] text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-xs">
+                  {favCount}
+                </span>
+              )}
+            </Link>
 
             {/* 2. Divider */}
             <div className="h-5 w-[1px] bg-gray-200" aria-hidden="true" />
@@ -314,6 +340,21 @@ export default function Navbar() {
             >
               <Search className="w-5 h-5 stroke-[2.2]" />
             </button>
+
+            {/* Mobile Wishlist Icon */}
+            <Link
+              href="/wishlist"
+              className="relative p-1.5 rounded-full text-stone-600 hover:text-[#D91E18] hover:bg-stone-100 transition-colors"
+              title="My Wishlist"
+              aria-label="View Wishlist"
+            >
+              <Heart className={`w-5 h-5 stroke-[2.2] ${favCount > 0 ? "fill-[#D91E18] text-[#D91E18]" : ""}`} />
+              {favCount > 0 && (
+                <span className="absolute top-0.5 right-0.5 bg-[#D91E18] text-white text-[9px] font-black w-3.5 h-3.5 rounded-full flex items-center justify-center">
+                  {favCount}
+                </span>
+              )}
+            </Link>
 
             {/* User Profile or Sign In Link */}
             {isAuthenticated && user ? (

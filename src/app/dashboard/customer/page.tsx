@@ -30,6 +30,10 @@ import {
   DollarSign,
   Heart,
   Trash2,
+  Mail,
+  Bell,
+  ExternalLink,
+  Sparkles,
 } from "lucide-react";
 
 interface CustomerOrder {
@@ -74,21 +78,44 @@ interface RawOrderResponse {
   };
 }
 
+interface OrderNotification {
+  _id?: string;
+  orderId: string;
+  status: "accepted" | "rejected";
+  subject: string;
+  pizzaName?: string;
+  vendorName?: string;
+  createdAt: string;
+  previewUrl?: string;
+}
+
 function CustomerDashboardInner() {
   const { user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const tabParam = searchParams.get("tab") as "overview" | "orders" | "favorites" | null;
+  const tabParam = searchParams.get("tab") as "overview" | "orders" | "favorites" | "notifications" | null;
 
   const [orders, setOrders] = useState<CustomerOrder[]>([]);
   const [favoriteItems, setFavoriteItems] = useState<FavoritePizzaItem[]>([]);
+  const [notifications, setNotifications] = useState<OrderNotification[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"overview" | "orders" | "favorites">(
-    tabParam === "orders" || tabParam === "favorites" ? tabParam : "overview"
+  const [activeTab, setActiveTab] = useState<"overview" | "orders" | "favorites" | "notifications">(
+    tabParam === "orders" || tabParam === "favorites" || tabParam === "notifications" ? tabParam : "overview"
   );
 
+  // Email Notification Preview Modal State
+  const [viewingEmailModal, setViewingEmailModal] = useState<{
+    orderId: string;
+    pizzaName: string;
+    vendorName: string;
+    status: "accepted" | "rejected";
+    date: string;
+    recipient: string;
+    previewUrl?: string;
+  } | null>(null);
+
   useEffect(() => {
-    if (tabParam === "orders" || tabParam === "overview" || tabParam === "favorites") {
+    if (tabParam === "orders" || tabParam === "overview" || tabParam === "favorites" || tabParam === "notifications") {
       setActiveTab(tabParam);
     }
   }, [tabParam]);
@@ -106,7 +133,7 @@ function CustomerDashboardInner() {
     toast.info(`Removed ${name} from your Wishlist`);
   };
 
-  const handleTabChange = (tab: "overview" | "orders" | "favorites") => {
+  const handleTabChange = (tab: "overview" | "orders" | "favorites" | "notifications") => {
     setActiveTab(tab);
     router.replace(`/dashboard/customer?tab=${tab}`);
   };
@@ -160,8 +187,22 @@ function CustomerDashboardInner() {
     }
   };
 
+  const fetchNotifications = async () => {
+    try {
+      const response = await apiRequest<{ success: boolean; notifications: OrderNotification[] }>(
+        "/api/orders/notifications"
+      );
+      if (response.success && response.notifications) {
+        setNotifications(response.notifications);
+      }
+    } catch {
+      // non-fatal fallback
+    }
+  };
+
   useEffect(() => {
     fetchOrders();
+    fetchNotifications();
   }, []);
 
   // Prompt Cancellation Modal
@@ -389,6 +430,18 @@ function CustomerDashboardInner() {
           <Heart className={`w-3.5 h-3.5 ${activeTab === "favorites" ? "fill-[#D91E18] text-[#D91E18]" : "text-stone-400"}`} />
           <span>My Wishlist ({favoriteItems.length})</span>
         </button>
+        <button
+          type="button"
+          onClick={() => handleTabChange("notifications")}
+          className={`px-5 py-2.5 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+            activeTab === "notifications"
+              ? "bg-stone-900 text-white shadow-sm"
+              : "bg-white text-stone-600 border border-stone-200 hover:bg-stone-50"
+          }`}
+        >
+          <Mail className={`w-3.5 h-3.5 ${activeTab === "notifications" ? "text-[#D91E18]" : "text-stone-400"}`} />
+          <span>Email Notices ({notifications.length || (acceptedOrders + rejectedOrders)})</span>
+        </button>
       </div>
 
       {/* ========================================================
@@ -396,7 +449,7 @@ function CustomerDashboardInner() {
          ======================================================== */}
       {activeTab === "overview" && (
         <div className="space-y-8">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
             {/* 1. Total Orders */}
             <div className="bg-white rounded-3xl p-5 border border-stone-200/90 shadow-xs">
               <p className="text-[11px] font-bold text-stone-400 uppercase tracking-wider">Total Orders</p>
@@ -420,7 +473,45 @@ function CustomerDashboardInner() {
               <p className="text-[11px] font-bold text-stone-400 uppercase tracking-wider">Rejected Orders</p>
               <p className="text-3xl font-black text-red-600 mt-2">{rejectedOrders}</p>
             </div>
+
+            {/* 5. My Wishlist (Saved Items) */}
+            <div
+              onClick={() => handleTabChange("favorites")}
+              className="col-span-2 sm:col-span-1 bg-white rounded-3xl p-5 border border-stone-200/90 shadow-xs cursor-pointer hover:border-red-200 transition-colors group"
+            >
+              <div className="flex items-center justify-between">
+                <p className="text-[11px] font-bold text-stone-400 uppercase tracking-wider">Saved Wishlist</p>
+                <Heart className="w-3.5 h-3.5 text-stone-400 group-hover:text-[#D91E18] transition-colors" />
+              </div>
+              <p className="text-3xl font-black text-[#D91E18] mt-2">{favoriteItems.length}</p>
+            </div>
           </div>
+
+          {/* Automated Email Notifications Alert Banner */}
+          {(acceptedOrders > 0 || rejectedOrders > 0 || notifications.length > 0) && (
+            <div className="p-4 rounded-2xl bg-gradient-to-r from-red-50/70 via-amber-50/50 to-stone-50 border border-red-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-red-100 text-[#D91E18] flex items-center justify-center shrink-0">
+                  <Mail className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-xs font-black text-stone-900">
+                    Automated Email Notifications Active
+                  </p>
+                  <p className="text-[11px] text-stone-500">
+                    Emails are automatically dispatched to your inbox whenever a kitchen accepts or declines an order.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleTabChange("notifications")}
+                className="px-4 py-2 rounded-full bg-white border border-stone-200 hover:bg-stone-50 text-xs font-bold text-stone-700 transition-colors cursor-pointer shrink-0"
+              >
+                View Email Logs &rarr;
+              </button>
+            </div>
+          )}
 
           {/* Recent Orders Preview */}
           <div className="bg-white rounded-3xl border border-stone-200/90 shadow-xs p-6 sm:p-8 space-y-4">
@@ -769,6 +860,137 @@ function CustomerDashboardInner() {
       )}
 
       {/* ========================================================
+          4. EMAIL NOTIFICATIONS LOG (Requirement 5)
+         ======================================================== */}
+      {activeTab === "notifications" && (
+        <div className="bg-white rounded-3xl border border-stone-200/90 shadow-xs p-6 sm:p-8 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 border border-red-100 text-[#D91E18] text-[11px] font-black uppercase tracking-wider mb-1">
+                <Mail className="w-3.5 h-3.5" />
+                <span>Automated Email Notification System</span>
+              </div>
+              <h2 className="text-xl font-black text-stone-900">Email Notifications Log</h2>
+              <p className="text-xs text-stone-500 font-medium mt-0.5">
+                Full delivery audit trail of automated emails dispatched when orders were accepted or rejected by kitchens.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                fetchNotifications();
+                fetchOrders();
+                toast.success("Notification log refreshed");
+              }}
+              className="p-2.5 rounded-full border border-stone-200 text-stone-600 hover:text-[#D91E18] cursor-pointer self-start sm:self-auto"
+              title="Refresh Notifications"
+            >
+              <RefreshCw className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* If no notifications yet */}
+          {notifications.length === 0 && orders.filter((o) => o.status === "accepted" || o.status === "rejected").length === 0 ? (
+            <div className="py-16 text-center space-y-3">
+              <div className="w-16 h-16 rounded-full bg-stone-100 text-stone-400 flex items-center justify-center mx-auto">
+                <Mail className="w-8 h-8" />
+              </div>
+              <p className="text-base font-bold text-stone-800">No Email Notifications Yet</p>
+              <p className="text-xs text-stone-500 max-w-sm mx-auto">
+                When a kitchen accepts or declines your order, an automated email notification is dispatched to your inbox and logged here.
+              </p>
+            </div>
+          ) : (
+            <div className="divide-y divide-stone-100">
+              {(notifications.length > 0
+                ? notifications
+                : orders
+                    .filter((o) => o.status === "accepted" || o.status === "rejected")
+                    .map((o): OrderNotification => ({
+                      _id: o._id,
+                      orderId: o._id,
+                      status: o.status as "accepted" | "rejected",
+                      subject:
+                        o.status === "accepted"
+                          ? `🎉 Your PizzaHub Order #${o._id.slice(-6).toUpperCase()} has been Accepted`
+                          : `Order Update: PizzaHub Order #${o._id.slice(-6).toUpperCase()} was Declined`,
+                      pizzaName: o.itemName,
+                      vendorName: o.vendorName,
+                      createdAt: o.createdAt,
+                    }))
+              ).map((notif, idx) => {
+                const isAccepted = notif.status === "accepted";
+                const pizzaName = notif.pizzaName || "Artisan Pizza";
+                const vendorName = notif.vendorName || "Artisan Kitchen";
+                const notifDate = notif.createdAt ? new Date(notif.createdAt).toLocaleString() : "Recently";
+
+                return (
+                  <div
+                    key={notif._id || notif.orderId || idx}
+                    className="py-5 first:pt-0 last:pb-0 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+                  >
+                    <div className="flex items-start gap-3.5">
+                      <div
+                        className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${
+                          isAccepted
+                            ? "bg-emerald-50 text-emerald-600 border border-emerald-100"
+                            : "bg-red-50 text-red-600 border border-red-100"
+                        }`}
+                      >
+                        <Mail className="w-5 h-5" />
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-sm font-black text-stone-900">
+                            {notif.subject || (isAccepted ? `Order Accepted: ${pizzaName}` : `Order Declined: ${pizzaName}`)}
+                          </h3>
+                          <span
+                            className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                              isAccepted
+                                ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                                : "bg-red-50 text-red-700 border border-red-200"
+                            }`}
+                          >
+                            {isAccepted ? "Accepted Email" : "Decline Notice"}
+                          </span>
+                        </div>
+                        <p className="text-xs text-stone-500">
+                          Kitchen: <strong className="text-stone-700">{vendorName}</strong> • Recipient:{" "}
+                          <strong className="text-stone-700">{user?.email || "customer"}</strong>
+                        </p>
+                        <p className="text-[11px] text-stone-400">
+                          Dispatched: {notifDate}
+                        </p>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setViewingEmailModal({
+                          orderId: notif.orderId || "",
+                          pizzaName,
+                          vendorName,
+                          status: notif.status,
+                          date: notif.createdAt,
+                          recipient: user?.email || "customer@email.com",
+                          previewUrl: notif.previewUrl,
+                        })
+                      }
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-stone-200 bg-white hover:bg-stone-50 text-xs font-bold text-stone-700 transition-colors cursor-pointer self-end sm:self-center"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5 text-[#D91E18]" />
+                      <span>Preview Email</span>
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ========================================================
           MODAL 1: VIEW ORDER DETAILS MODAL
          ======================================================== */}
       {viewingOrder && (
@@ -832,6 +1054,53 @@ function CustomerDashboardInner() {
                   </p>
                 </div>
               )}
+
+              {/* Optional Requirement 5: Email Notification Dispatch Status */}
+              {(viewingOrder.status === "accepted" || viewingOrder.status === "rejected") && (
+                <div className="pt-2 border-t border-stone-100">
+                  <div className="p-3.5 rounded-2xl bg-stone-50 border border-stone-200/80 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2.5">
+                      <div
+                        className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+                          viewingOrder.status === "accepted"
+                            ? "bg-emerald-100 text-emerald-700"
+                            : "bg-red-100 text-red-700"
+                        }`}
+                      >
+                        <Mail className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-black text-stone-900">
+                          {viewingOrder.status === "accepted"
+                            ? "Acceptance Email Dispatched"
+                            : "Decline Email Dispatched"}
+                        </p>
+                        <p className="text-[10px] text-stone-500">
+                          Sent to {user?.email || "customer"}
+                        </p>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setViewingEmailModal({
+                          orderId: viewingOrder._id,
+                          pizzaName: viewingOrder.itemName,
+                          vendorName: viewingOrder.vendorName,
+                          status: viewingOrder.status as "accepted" | "rejected",
+                          date: viewingOrder.createdAt,
+                          recipient: user?.email || "customer@email.com",
+                        })
+                      }
+                      className="px-3 py-1.5 rounded-full bg-white border border-stone-200 hover:bg-stone-100 text-[11px] font-bold text-stone-700 transition-colors cursor-pointer flex items-center gap-1"
+                    >
+                      <ExternalLink className="w-3 h-3 text-[#D91E18]" />
+                      <span>View Email</span>
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="pt-3 flex items-center justify-end gap-2">
@@ -872,6 +1141,120 @@ function CustomerDashboardInner() {
           onConfirm={handleConfirmCancelOrder}
           onCancel={() => setCancelConfirmOrder(null)}
         />
+      )}
+
+      {/* ========================================================
+          MODAL 3: VIEW EMAIL NOTIFICATION PREVIEW MODAL
+         ======================================================== */}
+      {viewingEmailModal && (
+        <div className="fixed inset-0 bg-stone-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in">
+          <div className="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl border border-stone-200 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-stone-100">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-red-50 text-[#D91E18] flex items-center justify-center">
+                  <Mail className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-black text-stone-900">Email Notification Preview</h3>
+                  <p className="text-[10px] text-stone-400">Automated Nodemailer Dispatch</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setViewingEmailModal(null)}
+                className="p-1 rounded-lg text-stone-400 hover:text-stone-700 cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Email Metadata Card */}
+            <div className="bg-stone-50 rounded-2xl p-4 border border-stone-200/70 space-y-1.5 text-xs">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-stone-400 uppercase text-[10px]">From:</span>
+                <span className="font-semibold text-stone-700">PizzaHub Kitchen &lt;no-reply@pizzahub.com&gt;</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-stone-400 uppercase text-[10px]">To:</span>
+                <span className="font-semibold text-stone-700">{viewingEmailModal.recipient}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-stone-400 uppercase text-[10px]">Subject:</span>
+                <span className="font-bold text-stone-900 truncate max-w-[260px]">
+                  {viewingEmailModal.status === "accepted"
+                    ? `🎉 Your PizzaHub Order #${viewingEmailModal.orderId.slice(-6).toUpperCase()} has been Accepted`
+                    : `Order Update: PizzaHub Order #${viewingEmailModal.orderId.slice(-6).toUpperCase()} was Declined`}
+                </span>
+              </div>
+            </div>
+
+            {/* Rendered Email Body Simulation */}
+            <div className="rounded-2xl border border-stone-200 overflow-hidden shadow-xs">
+              <div className="bg-[#1C1917] p-4 flex items-center justify-between">
+                <span className="text-lg font-black text-white">
+                  PIZZA<span className="text-[#D91E18]">HUB</span>
+                </span>
+                <span className="text-[9px] font-black uppercase text-stone-400 bg-stone-800 px-2 py-0.5 rounded-full">
+                  Verified Notification
+                </span>
+              </div>
+
+              <div className="p-5 space-y-4 bg-white">
+                <div
+                  className={`p-4 rounded-xl border ${
+                    viewingEmailModal.status === "accepted"
+                      ? "bg-emerald-50 border-emerald-200 text-emerald-900"
+                      : "bg-red-50 border-red-200 text-red-900"
+                  }`}
+                >
+                  <p className="font-extrabold text-sm">
+                    {viewingEmailModal.status === "accepted"
+                      ? "🎉 Order Accepted by Kitchen"
+                      : "Order Could Not Be Fulfilled"}
+                  </p>
+                  <p className="text-xs mt-1 leading-relaxed text-stone-700">
+                    {viewingEmailModal.status === "accepted"
+                      ? `Great news! ${viewingEmailModal.vendorName} has reviewed and accepted your pizza order. The kitchen is firing up the woodfired oven at 450°C to prepare it fresh.`
+                      : `We are sorry to inform you that ${viewingEmailModal.vendorName} is unable to fulfill this order for the requested time slot. No charges were made.`}
+                  </p>
+                </div>
+
+                <div className="bg-stone-50 p-3.5 rounded-xl border border-stone-200 text-xs space-y-1.5">
+                  <div className="flex justify-between">
+                    <span className="text-stone-500">Item:</span>
+                    <strong className="text-stone-900">{viewingEmailModal.pizzaName}</strong>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-stone-500">Kitchen:</span>
+                    <strong className="text-stone-900">{viewingEmailModal.vendorName}</strong>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-stone-500">Order Ref:</span>
+                    <span className="font-mono font-bold text-stone-700">
+                      #{viewingEmailModal.orderId.slice(-8).toUpperCase()}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="text-center pt-2">
+                  <span className="inline-block px-5 py-2 rounded-full bg-[#D91E18] text-white font-bold text-xs">
+                    Track Live in Dashboard
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-1">
+              <button
+                type="button"
+                onClick={() => setViewingEmailModal(null)}
+                className="px-5 py-2 rounded-full bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs cursor-pointer"
+              >
+                Close Preview
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

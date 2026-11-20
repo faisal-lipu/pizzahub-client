@@ -24,6 +24,8 @@ import {
   Settings,
   Users,
   DollarSign,
+  Heart,
+  Mail,
 } from "lucide-react";
 
 function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
@@ -133,6 +135,18 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
         href: "/dashboard/customer?tab=orders",
         icon: ShoppingBag,
         active: pathname === "/dashboard/customer" && currentTab === "orders",
+      },
+      {
+        label: "My Wishlist",
+        href: "/dashboard/customer?tab=favorites",
+        icon: Heart,
+        active: pathname === "/dashboard/customer" && currentTab === "favorites",
+      },
+      {
+        label: "Email Notifications",
+        href: "/dashboard/customer?tab=notifications",
+        icon: Mail,
+        active: pathname === "/dashboard/customer" && currentTab === "notifications",
       },
       {
         label: "Browse Menu",

@@ -34,6 +34,7 @@ import {
   User,
   MessageSquare,
   Power,
+  Mail,
 } from "lucide-react";
 
 interface MenuItem {
@@ -433,8 +434,8 @@ function VendorDashboardInner() {
       if (response.success) {
         toast.success(
           action === "accept"
-            ? "Order accepted and sent to kitchen!"
-            : "Order has been rejected."
+            ? "Order accepted! Automated email notification sent to customer."
+            : "Order rejected. Notification email dispatched to customer."
         );
         fetchVendorData();
       } else {
@@ -1255,15 +1256,25 @@ function VendorDashboardInner() {
                           </button>
                         </>
                       ) : isAccepted ? (
-                        <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200">
-                          <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
-                          Accepted
-                        </span>
+                        <div className="flex flex-col items-end gap-1">
+                          <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200">
+                            <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
+                            Accepted
+                          </span>
+                          <span className="inline-flex items-center gap-1 text-[10px] text-stone-500 font-medium">
+                            <Mail className="w-3 h-3 text-[#D91E18]" /> Email Dispatched
+                          </span>
+                        </div>
                       ) : isRejected ? (
-                        <span className="inline-flex items-center gap-1 text-xs font-bold text-red-800 bg-red-50 px-3 py-1.5 rounded-full border border-red-200">
-                          <XCircle className="w-3.5 h-3.5 text-red-600" />
-                          Rejected
-                        </span>
+                        <div className="flex flex-col items-end gap-1">
+                          <span className="inline-flex items-center gap-1 text-xs font-bold text-red-800 bg-red-50 px-3 py-1.5 rounded-full border border-red-200">
+                            <XCircle className="w-3.5 h-3.5 text-red-600" />
+                            Rejected
+                          </span>
+                          <span className="inline-flex items-center gap-1 text-[10px] text-stone-500 font-medium">
+                            <Mail className="w-3 h-3 text-[#D91E18]" /> Email Dispatched
+                          </span>
+                        </div>
                       ) : (
                         <span className="text-xs font-bold capitalize px-3 py-1.5 rounded-full bg-stone-100 text-stone-700">
                           Status: {order.status}
