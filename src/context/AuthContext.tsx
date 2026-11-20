@@ -34,9 +34,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState<boolean>(true);
   const router = useRouter();
 
-  // Load auth credentials from localStorage on initial page load to prevent reload logout bugs
+  // Load auth credentials from localStorage or Better Auth session on initial page load
   useEffect(() => {
-    const syncAuth = () => {
+    const syncAuth = async () => {
       try {
         const savedToken = localStorage.getItem("token");
         const savedUser = localStorage.getItem("user");
@@ -44,6 +44,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (savedToken && savedUser) {
           setToken(savedToken);
           setUser(JSON.parse(savedUser));
+          setLoading(false);
+          return;
+        }
+
+        // Check for active Better Auth session (e.g. following Google OAuth redirect)
+        const sessionRes = await authClient.getSession().catch(() => null);
+        if (sessionRes?.data?.user?.email) {
+          const googleUser = sessionRes.data.user;
+          const pendingRole = localStorage.getItem("pending_signup_role") || "customer";
+          const pendingBiz = localStorage.getItem("pending_business_name") || "";
+
+          // Import apiRequest dynamically or use fetch
+          const apiBase = process.env.NEXT_PUBLIC_API_URL || "https://pizzahub-server-seven.vercel.app";
+          const res = await fetch(`${apiBase}/api/auth/jwt`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: googleUser.email,
+              name: googleUser.name,
+              image: googleUser.image || null,
+              role: pendingRole,
+              businessName: pendingBiz,
+            }),
+          }).then((r) => r.json()).catch(() => null);
+
+          if (res?.success && res.token && res.user) {
+            setToken(res.token);
+            setUser(res.user);
+            localStorage.setItem("token", res.token);
+            localStorage.setItem("user", JSON.stringify(res.user));
+            localStorage.removeItem("pending_signup_role");
+            localStorage.removeItem("pending_business_name");
+          }
         }
       } catch (error) {
         console.error("[Auth Context] Failed to parse saved session:", error);

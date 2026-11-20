@@ -8,7 +8,16 @@ import { useAuth } from "@/context/AuthContext";
 import { authClient } from "@/lib/auth-client";
 import { apiRequest } from "@/lib/api";
 import { toast } from "sonner";
-import { Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
+import {
+  Mail,
+  Lock,
+  ArrowRight,
+  Loader2,
+  Eye,
+  EyeOff,
+  AlertCircle,
+  CheckCircle2,
+} from "lucide-react";
 
 interface LoginResponse {
   success: boolean;
@@ -51,7 +60,11 @@ function GoogleIcon() {
 
 /**
  * Sign In Page Component
- * Allows registered users (Customer, Vendor, Admin) to authenticate into the platform
+ * Implements:
+ * 1. Fields: Email and Password
+ * 2. Credential login and Google login
+ * 3. Success and error messages (toast + inline alert banner)
+ * 4. After login, redirect users according to their role (admin, vendor, customer)
  */
 export default function SignInPage() {
   const router = useRouter();
@@ -59,14 +72,29 @@ export default function SignInPage() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage("");
+    setSuccessMessage("");
 
+    // Field validation
     if (!email.trim() || !password.trim()) {
-      toast.error("Please enter both email and password.");
+      const msg = "Please enter both your email address and password.";
+      setErrorMessage(msg);
+      toast.error(msg);
+      return;
+    }
+
+    if (password.length < 6) {
+      const msg = "Password must be at least 6 characters long.";
+      setErrorMessage(msg);
+      toast.error(msg);
       return;
     }
 
@@ -77,27 +105,35 @@ export default function SignInPage() {
         method: "POST",
         data: {
           email: email.trim(),
+          isLogin: true,
         },
       });
 
       if (response.success && response.token && response.user) {
         login(response.token, response.user);
-        toast.success(`Welcome back, ${response.user.name}!`);
+        const successMsg = `Welcome back, ${response.user.name}! Login successful.`;
+        setSuccessMessage(successMsg);
+        toast.success(successMsg);
 
-        // Redirect user based on their specific role
-        if (response.user.role === "admin") {
-          router.push("/dashboard/admin");
-        } else if (response.user.role === "vendor") {
-          router.push("/dashboard/vendor");
-        } else {
-          router.push("/dashboard/customer");
-        }
+        // Role-based redirection according to assignment requirements
+        setTimeout(() => {
+          if (response.user.role === "admin") {
+            router.push("/dashboard/admin");
+          } else if (response.user.role === "vendor") {
+            router.push("/dashboard/vendor");
+          } else {
+            router.push("/dashboard/customer");
+          }
+        }, 500);
       } else {
-        toast.error(response.message || "Failed to authenticate.");
+        const errorMsg = response.message || "Failed to authenticate with provided credentials.";
+        setErrorMessage(errorMsg);
+        toast.error(errorMsg);
       }
     } catch (err: unknown) {
       const errorMsg =
-        err instanceof Error ? err.message : "Invalid credentials. Please try again.";
+        err instanceof Error ? err.message : "Invalid credentials. Please check your email and password.";
+      setErrorMessage(errorMsg);
       toast.error(errorMsg);
     } finally {
       setLoading(false);
@@ -105,6 +141,9 @@ export default function SignInPage() {
   };
 
   const handleGoogleSignIn = async () => {
+    setErrorMessage("");
+    setSuccessMessage("");
+
     try {
       setGoogleLoading(true);
 
@@ -118,7 +157,9 @@ export default function SignInPage() {
       }
     } catch (err: unknown) {
       console.error("[Google Sign-in Error]:", err);
-      toast.error("Google sign in failed. Please try again.");
+      const msg = "Google authentication failed. Please try again.";
+      setErrorMessage(msg);
+      toast.error(msg);
       setGoogleLoading(false);
     }
   };
@@ -145,6 +186,22 @@ export default function SignInPage() {
           <h2 className="mt-3 text-2xl font-bold text-[#111827]">Welcome back!</h2>
           <p className="mt-1 text-sm text-gray-500">Sign in to manage your orders or restaurant</p>
         </div>
+
+        {/* Success Alert Banner */}
+        {successMessage && (
+          <div className="mb-5 p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center gap-2.5 animate-in fade-in">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span>{successMessage}</span>
+          </div>
+        )}
+
+        {/* Error Alert Banner */}
+        {errorMessage && (
+          <div className="mb-5 p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold flex items-center gap-2.5 animate-in fade-in">
+            <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+            <span>{errorMessage}</span>
+          </div>
+        )}
 
         {/* Google Authentication Button */}
         <div className="mb-6">
@@ -177,6 +234,7 @@ export default function SignInPage() {
           </div>
         </div>
 
+        {/* Credential Login Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Email Field */}
           <div>
@@ -187,7 +245,10 @@ export default function SignInPage() {
               <input
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (errorMessage) setErrorMessage("");
+                }}
                 placeholder="you@example.com"
                 required
                 className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#D91E18] focus:ring-2 focus:ring-red-100 transition-all text-[#111827]"
@@ -203,21 +264,37 @@ export default function SignInPage() {
             </label>
             <div className="relative">
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (errorMessage) setErrorMessage("");
+                }}
                 placeholder="••••••••"
                 required
-                className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#D91E18] focus:ring-2 focus:ring-red-100 transition-all text-[#111827]"
+                className="w-full pl-10 pr-11 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#D91E18] focus:ring-2 focus:ring-red-100 transition-all text-[#111827]"
               />
               <Lock className="w-5 h-5 text-gray-400 absolute left-3 top-3.5" />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                tabIndex={-1}
+                className="absolute right-3.5 top-3.5 text-gray-400 hover:text-gray-600 transition-colors"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-4 h-4" />
+                ) : (
+                  <Eye className="w-4 h-4" />
+                )}
+              </button>
             </div>
           </div>
 
           {/* Submit Button */}
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || googleLoading}
             className="w-full mt-4 flex items-center justify-center gap-2 py-3.5 px-4 rounded-full bg-[#D91E18] hover:bg-[#B91C1C] text-white font-semibold text-sm transition-all shadow-md shadow-red-500/20 disabled:opacity-50 cursor-pointer"
           >
             {loading ? (
