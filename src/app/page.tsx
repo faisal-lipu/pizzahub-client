@@ -14,6 +14,8 @@ import {
   Flame,
   Heart,
   X,
+  Pizza,
+  Sparkles,
 } from "lucide-react";
 import { apiRequest } from "@/lib/api";
 
@@ -156,52 +158,63 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-[#FAF8F5] text-stone-900 overflow-x-hidden">
       {/* ========================================================
-          1. HERO SECTION (Matching Mockup with Italo-Pizza vibe)
+          1. BANNER SECTION (Hero Banner per Assignment Requirements)
+          - Clear headline: "Hot & Fresh Pizza Delivered to Your Door"
+          - Short description
+          - CTA button: "Explore Pizza Menu"
+          - Pizza-themed background image or illustration
          ======================================================== */}
-      <section className="relative pt-6 pb-20 md:pt-12 md:pb-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <section className="relative pt-6 pb-20 md:pt-12 md:pb-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden">
+        {/* Pizza-Themed Ambient Background Illustration & Glow */}
+        <div className="absolute top-0 right-10 w-96 h-96 bg-gradient-to-br from-amber-400/20 via-red-500/10 to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
+        <div className="absolute -bottom-10 -left-10 w-72 h-72 bg-gradient-to-tr from-red-500/10 via-amber-300/10 to-transparent rounded-full blur-2xl pointer-events-none -z-10" />
+        
+        {/* Background decorative pizza doodle SVG watermark */}
+        <div className="absolute inset-0 pointer-events-none opacity-[0.035] -z-10 bg-[radial-gradient(#D91E18_1px,transparent_1px)] [background-size:24px_24px]" />
+
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
           {/* Left Text Column */}
           <div className="lg:col-span-7 space-y-6">
-            {/* Italo-Pizza Kicker */}
-            <div className="inline-flex items-center gap-2">
-              <span className="font-serif italic text-2xl md:text-3xl font-medium text-amber-600 tracking-wide">
-                Italo-Pizza
+            {/* PizzaHub Fresh Kicker */}
+            <div className="inline-flex items-center gap-2 bg-amber-50 border border-amber-200/80 px-3.5 py-1.5 rounded-full shadow-xs">
+              <span className="font-serif italic text-base md:text-lg font-bold text-amber-700 tracking-wide">
+                Artisan Woodfired Pizza
               </span>
-              <span className="text-amber-500 text-lg">✨</span>
+              <span className="text-amber-500 text-sm">✨</span>
             </div>
 
-            {/* Main Catchy Headline */}
+            {/* Clear Headline (Matches exact requirement example) */}
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-stone-900 leading-[1.12]">
-              15 Minute only for{" "}
-              <span className="block text-[#D91E18]">authentic pizza.</span>
+              Hot &amp; Fresh Pizza{" "}
+              <span className="block text-[#D91E18]">Delivered to Your Door.</span>
             </h1>
 
-            {/* Subtitle */}
-            <p className="text-base sm:text-lg text-stone-600 font-medium max-w-lg">
-              Fresh ingredients. Great taste. Fast delivery. Direct from master
-              artisan pizzerias to your table.
+            {/* Short Description */}
+            <p className="text-base sm:text-lg text-stone-600 font-medium max-w-lg leading-relaxed">
+              Craving authentic stone-oven pizza? Enjoy hand-tossed artisanal pizzas baked with
+              fresh San Marzano sauce, 100% real mozzarella, and gourmet toppings delivered hot to your doorstep.
             </p>
 
-            {/* Action Buttons (Pill styling matching screenshot) */}
+            {/* Action Buttons with Required CTA: "Explore Pizza Menu" */}
             <div className="flex flex-wrap items-center gap-4 pt-3">
               <Link
                 href="/menu"
-                className="inline-flex items-center gap-2.5 bg-[#D91E18] hover:bg-[#B91C1C] text-white font-bold text-sm sm:text-base px-7 py-3.5 rounded-full shadow-lg shadow-red-500/25 transition-all transform hover:-translate-y-0.5"
+                className="inline-flex items-center gap-2.5 bg-[#D91E18] hover:bg-[#B91C1C] text-white font-bold text-sm sm:text-base px-7 py-3.5 rounded-full shadow-lg shadow-red-500/25 transition-all transform hover:-translate-y-0.5 cursor-pointer"
               >
-                <ShoppingCart className="w-4 h-4 stroke-[2.5]" />
-                Order Now
+                <Pizza className="w-5 h-5 stroke-[2]" />
+                <span>Explore Pizza Menu</span>
                 <ArrowRight className="w-4 h-4 stroke-[2.5]" />
               </Link>
 
               <button
                 type="button"
                 onClick={() => setVideoModalOpen(true)}
-                className="inline-flex items-center gap-3 bg-white hover:bg-stone-50 text-stone-800 font-bold text-sm sm:text-base px-6 py-3.5 rounded-full border border-stone-200/90 shadow-sm transition-all"
+                className="inline-flex items-center gap-3 bg-white hover:bg-stone-50 text-stone-800 font-bold text-sm sm:text-base px-6 py-3.5 rounded-full border border-stone-200/90 shadow-sm transition-all cursor-pointer"
               >
                 <span className="w-7 h-7 rounded-full bg-red-100 flex items-center justify-center text-[#D91E18]">
                   <Play className="w-3.5 h-3.5 fill-[#D91E18] ml-0.5" />
                 </span>
-                Watch Video
+                <span>Watch Video</span>
               </button>
             </div>
 
@@ -222,25 +235,34 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Right Visual Column (Pizza on Platter) */}
+          {/* Right Visual Column (Pizza-themed composition & illustrations) */}
           <div className="lg:col-span-5 relative flex items-center justify-center">
             {/* Background Warm Sunburst Shape */}
             <div className="absolute w-72 sm:w-96 h-72 sm:h-96 rounded-full bg-gradient-to-tr from-amber-400/40 via-amber-200/40 to-red-100/30 blur-2xl -z-10" />
+
+            {/* Floating Top Badge: 100% Real Cheese */}
+            <div className="absolute -top-3 -left-4 sm:-left-6 z-10 bg-white/95 backdrop-blur-md rounded-2xl px-4 py-2 shadow-xl border border-stone-200/80 flex items-center gap-2 animate-bounce duration-1000">
+              <span className="text-xl">🧀</span>
+              <div>
+                <p className="text-[11px] font-black text-stone-900 leading-tight">100% Mozzarella</p>
+                <p className="text-[10px] font-medium text-stone-500">Melted to perfection</p>
+              </div>
+            </div>
 
             {/* Hero Pizza Composition */}
             <div className="relative w-full max-w-[420px] aspect-square rounded-3xl overflow-hidden shadow-2xl border-4 border-white transform hover:scale-[1.02] transition-transform duration-300">
               <Image
                 src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=1000&auto=format&fit=crop&q=85"
-                alt="Fresh Artisan Pizza with melted mozzarella"
+                alt="Hot & Fresh Artisan Pizza with melted cheese and fresh toppings"
                 fill
                 priority
                 sizes="(max-width: 768px) 100vw, 450px"
                 className="object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 
-              {/* Float Tag: Fresh Oven Baked */}
-              <div className="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-md rounded-2xl p-3 shadow-lg flex items-center justify-between border border-white">
+              {/* Bottom Tag: Fresh Oven Baked */}
+              <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-md rounded-2xl p-3 shadow-lg flex items-center justify-between border border-white">
                 <div className="flex items-center gap-2.5">
                   <span className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-[#D91E18]">
                     <Flame className="w-4 h-4 fill-[#D91E18]" />
@@ -251,7 +273,7 @@ export default function HomePage() {
                   </div>
                 </div>
                 <span className="text-xs font-black text-[#D91E18] bg-red-50 px-2.5 py-1 rounded-full">
-                  Hot & Crispy
+                  Hot &amp; Crispy
                 </span>
               </div>
             </div>
