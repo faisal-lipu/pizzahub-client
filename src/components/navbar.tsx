@@ -195,7 +195,8 @@ export default function Navbar() {
                   <UserAvatar
                     src={user.image}
                     name={userName}
-                    size="xs"
+                    size="sm"
+                    isPremium={user.subscriptionPlan === "premium"}
                     className="border-red-200"
                   />
                 </button>

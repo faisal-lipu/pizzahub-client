@@ -210,6 +210,7 @@ export default function DashboardLayout({
                   src={user?.image}
                   name={user?.name}
                   size="md"
+                  isPremium={user?.subscriptionPlan === "premium"}
                   className="border-stone-200 shadow-xs"
                 />
                 <div className="flex-1 min-w-0">
