@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, Suspense } from "react";
-import Image from "next/image";
+import PizzaImage from "@/components/PizzaImage";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Search, Filter, ArrowUpDown, Star, Heart, Loader2 } from "lucide-react";
@@ -266,8 +266,8 @@ function MenuContent() {
               >
                 {/* Image */}
                 <div className="relative w-full h-52 overflow-hidden bg-stone-100">
-                  <Image
-                    src={pizza.image || "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&auto=format&fit=crop&q=80"}
+                  <PizzaImage
+                    src={pizza.image}
                     alt={pizza.name}
                     fill
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"

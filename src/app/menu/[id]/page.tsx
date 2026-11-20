@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
+import PizzaImage from "@/components/PizzaImage";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -279,8 +279,8 @@ interface RawMenuItemDetail {
         {/* Left Column: Image & Highlights */}
         <div className="lg:col-span-6 p-6 sm:p-8 flex flex-col justify-between bg-stone-50/50 border-b lg:border-b-0 lg:border-r border-stone-200/80">
           <div className="relative w-full aspect-square max-h-[440px] rounded-2xl overflow-hidden shadow-md mx-auto">
-            <Image
-              src={item.image || "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&auto=format&fit=crop&q=80"}
+            <PizzaImage
+              src={item.image}
               alt={item.name}
               fill
               priority

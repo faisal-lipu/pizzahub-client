@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import PizzaImage from "@/components/PizzaImage";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { useAuth } from "@/context/AuthContext";
 import { apiRequest } from "@/lib/api";
@@ -413,8 +413,8 @@ function VendorDashboardContent() {
                 <div key={item._id} className="p-4 rounded-2xl border border-stone-200 bg-stone-50/50 flex flex-col justify-between">
                   <div>
                     <div className="relative w-full h-36 rounded-xl overflow-hidden mb-3 bg-stone-200">
-                      <Image
-                        src={item.image || "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&auto=format&fit=crop&q=80"}
+                      <PizzaImage
+                        src={item.image}
                         alt={item.name}
                         fill
                         sizes="300px"
