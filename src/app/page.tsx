@@ -360,90 +360,7 @@ export default function HomePage() {
       </section>
 
       {/* ========================================================
-          2. PIZZA CATEGORIES SECTION (Dynamic Section 2: Pizza Categories)
-          - Requirement: Users can explore items by category:
-            1. Classic Pizzas
-            2. Vegetarian Pizzas
-            3. Meat Lovers
-            4. Specialty / Gourmet Pizzas
-            5. Sides & Appetizers
-            6. Beverages & Desserts
-         ======================================================== */}
-      <section className="py-12 md:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-8 gap-4">
-          <div>
-            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#D91E18] uppercase tracking-wider mb-1">
-              <Pizza className="w-3.5 h-3.5" />
-              <span>Explore By Taste</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
-              Pizza Categories
-            </h2>
-            <p className="text-sm text-stone-500 font-medium mt-1">
-              Explore freshly crafted pizzas, gourmet sides, and artisan desserts by category.
-            </p>
-          </div>
-
-          <Link
-            href="/menu"
-            className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-[#D91E18] hover:text-[#B91C1C] transition-colors"
-          >
-            <span>Browse All Menu</span>
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
-
-        {/* 6 Category Interactive Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {PIZZA_CATEGORIES.map((cat) => (
-            <Link
-              key={cat.id}
-              href={`/menu?category=${encodeURIComponent(cat.name)}`}
-              className="group relative bg-white rounded-3xl border border-stone-200/90 hover:border-amber-400 p-5 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden cursor-pointer"
-            >
-              {/* Subtle Ambient Hover Glow */}
-              <div className="absolute top-0 right-0 w-32 h-32 bg-amber-100/40 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500 pointer-events-none -z-0" />
-
-              <div className="relative z-10">
-                <div className="flex items-start justify-between mb-3.5">
-                  {/* Category Food Icon Box */}
-                  <div className="w-14 h-14 rounded-2xl bg-amber-50 group-hover:bg-amber-100/80 border border-amber-200/60 flex items-center justify-center text-3xl shadow-inner transition-colors">
-                    {cat.icon}
-                  </div>
-
-                  {/* Badge */}
-                  <span className="bg-stone-100 group-hover:bg-red-50 text-stone-600 group-hover:text-[#D91E18] text-[11px] font-bold px-2.5 py-1 rounded-full border border-stone-200/60 group-hover:border-red-200 transition-colors">
-                    {cat.badge}
-                  </span>
-                </div>
-
-                {/* Category Title */}
-                <h3 className="text-lg font-black text-stone-900 group-hover:text-[#D91E18] transition-colors tracking-tight">
-                  {cat.name}
-                </h3>
-
-                {/* Category Description */}
-                <p className="text-xs text-stone-500 line-clamp-2 leading-relaxed mt-1.5 mb-4">
-                  {cat.description}
-                </p>
-              </div>
-
-              {/* Action Link Footer */}
-              <div className="relative z-10 pt-3 border-t border-stone-100 flex items-center justify-between text-xs font-bold text-stone-700 group-hover:text-[#D91E18] transition-colors">
-                <span className="inline-flex items-center gap-1">
-                  Explore {cat.name.split(" ")[0]}
-                </span>
-                <span className="w-7 h-7 rounded-full bg-stone-100 group-hover:bg-[#D91E18] group-hover:text-white flex items-center justify-center transition-all transform group-hover:translate-x-0.5 shadow-2xs">
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </span>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* ========================================================
-          3. FEATURED MENU ITEMS SECTION (Dynamic Section 1)
+          2. FEATURED MENU ITEMS SECTION (Dynamic Section 1)
           - Shows at least 6 approved items from database
           - Displays: item image, name, category, price, location, vendor info, View Details button
          ======================================================== */}
@@ -586,6 +503,89 @@ export default function HomePage() {
               </div>
             );
           })}
+        </div>
+      </section>
+
+      {/* ========================================================
+          3. PIZZA CATEGORIES SECTION (Dynamic Section 2: Pizza Categories)
+          - Requirement: Users can explore items by category:
+            1. Classic Pizzas
+            2. Vegetarian Pizzas
+            3. Meat Lovers
+            4. Specialty / Gourmet Pizzas
+            5. Sides & Appetizers
+            6. Beverages & Desserts
+         ======================================================== */}
+      <section className="py-12 md:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-8 gap-4">
+          <div>
+            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#D91E18] uppercase tracking-wider mb-1">
+              <Pizza className="w-3.5 h-3.5" />
+              <span>Explore By Taste</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
+              Pizza Categories
+            </h2>
+            <p className="text-sm text-stone-500 font-medium mt-1">
+              Explore freshly crafted pizzas, gourmet sides, and artisan desserts by category.
+            </p>
+          </div>
+
+          <Link
+            href="/menu"
+            className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-[#D91E18] hover:text-[#B91C1C] transition-colors"
+          >
+            <span>Browse All Menu</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+
+        {/* 6 Category Interactive Cards Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {PIZZA_CATEGORIES.map((cat) => (
+            <Link
+              key={cat.id}
+              href={`/menu?category=${encodeURIComponent(cat.name)}`}
+              className="group relative bg-white rounded-3xl border border-stone-200/90 hover:border-amber-400 p-5 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden cursor-pointer"
+            >
+              {/* Subtle Ambient Hover Glow */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-amber-100/40 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500 pointer-events-none -z-0" />
+
+              <div className="relative z-10">
+                <div className="flex items-start justify-between mb-3.5">
+                  {/* Category Food Icon Box */}
+                  <div className="w-14 h-14 rounded-2xl bg-amber-50 group-hover:bg-amber-100/80 border border-amber-200/60 flex items-center justify-center text-3xl shadow-inner transition-colors">
+                    {cat.icon}
+                  </div>
+
+                  {/* Badge */}
+                  <span className="bg-stone-100 group-hover:bg-red-50 text-stone-600 group-hover:text-[#D91E18] text-[11px] font-bold px-2.5 py-1 rounded-full border border-stone-200/60 group-hover:border-red-200 transition-colors">
+                    {cat.badge}
+                  </span>
+                </div>
+
+                {/* Category Title */}
+                <h3 className="text-lg font-black text-stone-900 group-hover:text-[#D91E18] transition-colors tracking-tight">
+                  {cat.name}
+                </h3>
+
+                {/* Category Description */}
+                <p className="text-xs text-stone-500 line-clamp-2 leading-relaxed mt-1.5 mb-4">
+                  {cat.description}
+                </p>
+              </div>
+
+              {/* Action Link Footer */}
+              <div className="relative z-10 pt-3 border-t border-stone-100 flex items-center justify-between text-xs font-bold text-stone-700 group-hover:text-[#D91E18] transition-colors">
+                <span className="inline-flex items-center gap-1">
+                  Explore {cat.name.split(" ")[0]}
+                </span>
+                <span className="w-7 h-7 rounded-full bg-stone-100 group-hover:bg-[#D91E18] group-hover:text-white flex items-center justify-center transition-all transform group-hover:translate-x-0.5 shadow-2xs">
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </span>
+              </div>
+            </Link>
+          ))}
         </div>
       </section>
 
