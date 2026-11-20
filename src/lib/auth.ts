@@ -5,15 +5,35 @@ import { jwt } from "better-auth/plugins";
  * Better Auth Server Configuration
  * Configures authentication server with Google OAuth and JWT plugin
  */
+const getBaseUrl = () => {
+  if (process.env.BETTER_AUTH_URL && !process.env.BETTER_AUTH_URL.includes("localhost")) {
+    return process.env.BETTER_AUTH_URL;
+  }
+  if (process.env.NEXT_PUBLIC_APP_URL && !process.env.NEXT_PUBLIC_APP_URL.includes("localhost")) {
+    return process.env.NEXT_PUBLIC_APP_URL;
+  }
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  }
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  if (process.env.NODE_ENV === "production") {
+    return "https://pizzahub-client-beta.vercel.app";
+  }
+  return process.env.BETTER_AUTH_URL || "http://localhost:3000";
+};
+
 export const auth = betterAuth({
   secret:
     process.env.BETTER_AUTH_SECRET ||
     process.env.JWT_SECRET ||
     "pizzahub_default_jwt_secret_key_change_in_production_32chars",
-  baseURL:
-    process.env.BETTER_AUTH_URL ||
-    process.env.NEXT_PUBLIC_APP_URL ||
+  baseURL: getBaseUrl(),
+  trustedOrigins: [
+    "https://pizzahub-client-beta.vercel.app",
     "http://localhost:3000",
+  ],
   socialProviders: {
     google: {
       clientId:

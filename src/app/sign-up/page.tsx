@@ -154,22 +154,12 @@ export default function SignUpPage() {
 
       if (result?.data?.url) {
         window.location.href = result.data.url;
-        return;
       }
     } catch (err: unknown) {
-      console.warn("[Google Auth Redirect]:", err);
+      console.error("[Google Auth Error]:", err);
+      toast.error("Google authentication failed. Please try again.");
+      setGoogleLoading(false);
     }
-
-    // 2. Guaranteed direct redirection to Google OAuth consent screen
-    const clientId =
-      process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
-      process.env.BETTER_AUTH_GOOGLE_CLIENT_ID ||
-      "";
-    const origin = typeof window !== "undefined" ? window.location.origin : "https://pizzahub-client-beta.vercel.app";
-    const redirectUri = encodeURIComponent(`${origin}/api/auth/callback/google`);
-    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=openid%20email%20profile&prompt=select_account`;
-
-    window.location.href = googleAuthUrl;
   };
 
   return (
