@@ -58,7 +58,7 @@ function VendorDashboardContent() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
-  const [category, setCategory] = useState("Pepperoni");
+  const [category, setCategory] = useState("Classic Pizzas");
   const [location, setLocation] = useState(user?.businessName || "Downtown Kitchen, New York");
   const [image, setImage] = useState("");
   const [prepTime, setPrepTime] = useState("15");
@@ -511,11 +511,12 @@ function VendorDashboardContent() {
                   onChange={(e) => setCategory(e.target.value)}
                   className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-sm focus:outline-none focus:border-[#D91E18] bg-white cursor-pointer"
                 >
-                  <option value="Pepperoni">Pepperoni</option>
-                  <option value="Veggie">Veggie</option>
-                  <option value="Chicken">Chicken</option>
-                  <option value="Cheese">Cheese</option>
-                  <option value="Special">Special</option>
+                  <option value="Classic Pizzas">Classic Pizzas</option>
+                  <option value="Vegetarian Pizzas">Vegetarian Pizzas</option>
+                  <option value="Meat Lovers">Meat Lovers</option>
+                  <option value="Specialty / Gourmet Pizzas">Specialty / Gourmet Pizzas</option>
+                  <option value="Sides & Appetizers">Sides & Appetizers</option>
+                  <option value="Beverages & Desserts">Beverages & Desserts</option>
                 </select>
               </div>
 

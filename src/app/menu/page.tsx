@@ -4,7 +4,7 @@ import React, { useState, useEffect, Suspense } from "react";
 import PizzaImage from "@/components/PizzaImage";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Search, Filter, ArrowUpDown, Star, Heart, Loader2 } from "lucide-react";
+import { Search, Filter, ArrowUpDown, Star, Heart, Loader2, MapPin, Store, ArrowRight } from "lucide-react";
 import { apiRequest } from "@/lib/api";
 
 interface MenuItem {
@@ -16,71 +16,119 @@ interface MenuItem {
   image?: string;
   rating?: number;
   preparationTime?: number;
+  location?: string;
+  vendorName?: string;
+  isPremiumVendor?: boolean;
 }
 
-const CATEGORIES = ["All", "Pepperoni", "Veggie", "Chicken", "Cheese", "Special"];
+// 6 Official Categories per Assignment 9 Requirements + "All"
+const CATEGORIES = [
+  "All",
+  "Classic Pizzas",
+  "Vegetarian Pizzas",
+  "Meat Lovers",
+  "Specialty / Gourmet Pizzas",
+  "Sides & Appetizers",
+  "Beverages & Desserts",
+];
 
-// Fallback pizzas for demo state
+// Fallback pizzas for demo state covering all categories
 const FALLBACK_MENU: MenuItem[] = [
   {
     _id: "demo-1",
     name: "Classic Pepperoni Supreme",
     description: "Crispy beef pepperoni, rich San Marzano tomato sauce, and double mozzarella cheese.",
     price: 14.99,
-    category: "Pepperoni",
+    category: "Meat Lovers",
     image: "https://images.unsplash.com/photo-1628840042765-356cda07504e?w=800&auto=format&fit=crop&q=80",
     rating: 4.9,
     preparationTime: 15,
+    location: "Little Italy, New York",
+    vendorName: "Artisan Napoli Pizza Co.",
   },
   {
     _id: "demo-2",
     name: "Tuscan Margherita D.O.C.",
     description: "Authentic buffalo mozzarella, sweet cherry tomatoes, extra virgin olive oil, and fresh basil.",
     price: 12.50,
-    category: "Veggie",
+    category: "Classic Pizzas",
     image: "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=800&auto=format&fit=crop&q=80",
     rating: 4.8,
     preparationTime: 12,
+    location: "SoHo, Manhattan",
+    vendorName: "Bella Italia Ristorante",
   },
   {
     _id: "demo-3",
     name: "Smokey BBQ Chicken Feast",
     description: "Tender roasted chicken strips, hickory BBQ glaze, caramelized red onions, and smoked gouda.",
     price: 16.20,
-    category: "Chicken",
+    category: "Meat Lovers",
     image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&auto=format&fit=crop&q=80",
     rating: 4.9,
     preparationTime: 18,
+    location: "Williamsburg, Brooklyn",
+    vendorName: "Brooklyn Slice House",
   },
   {
     _id: "demo-4",
     name: "Quattro Formaggi Deluxe",
     description: "A velvety four-cheese blend of gorgonzola, aged parmesan, fontina, and melted mozzarella.",
     price: 15.00,
-    category: "Cheese",
+    category: "Vegetarian Pizzas",
     image: "https://images.unsplash.com/photo-1573821663912-569905455b1c?w=800&auto=format&fit=crop&q=80",
     rating: 4.7,
     preparationTime: 14,
+    location: "Greenwich Village, NY",
+    vendorName: "Roma Woodfire Pizzeria",
   },
   {
     _id: "demo-5",
     name: "Truffle Mushroom Special",
     description: "Wild portobello and button mushrooms with aromatic white truffle oil and fresh thyme.",
     price: 17.50,
-    category: "Special",
+    category: "Specialty / Gourmet Pizzas",
     image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&auto=format&fit=crop&q=80",
     rating: 5.0,
     preparationTime: 15,
+    location: "Upper East Side, NY",
+    vendorName: "Milano Gourmet Pizza",
   },
   {
     _id: "demo-6",
     name: "Spicy Diavola & Jalapeno",
     description: "Calabrian hot salami, roasted red chili peppers, spicy tomato reduction, and fresh herbs.",
     price: 15.80,
-    category: "Pepperoni",
+    category: "Classic Pizzas",
     image: "https://images.unsplash.com/photo-1593560708920-61dd98c46a4e?w=800&auto=format&fit=crop&q=80",
     rating: 4.8,
     preparationTime: 15,
+    location: "DUMBO, Brooklyn",
+    vendorName: "Venezia Pizzeria",
+  },
+  {
+    _id: "demo-7",
+    name: "Crispy Garlic Knots & Marinara",
+    description: "Golden oven-baked garlic herb knots served with warm San Marzano marinara dipping sauce.",
+    price: 7.99,
+    category: "Sides & Appetizers",
+    image: "https://images.unsplash.com/photo-1541592106381-b31e9677c0e5?w=800&auto=format&fit=crop&q=80",
+    rating: 4.9,
+    preparationTime: 10,
+    location: "Little Italy, New York",
+    vendorName: "Artisan Napoli Pizza Co.",
+  },
+  {
+    _id: "demo-8",
+    name: "Authentic Italian Tiramisu & Soda",
+    description: "Classic mascarpone coffee dessert with ladyfingers, paired with chilled Italian blood orange soda.",
+    price: 8.50,
+    category: "Beverages & Desserts",
+    image: "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=800&auto=format&fit=crop&q=80",
+    rating: 4.9,
+    preparationTime: 8,
+    location: "Little Italy, New York",
+    vendorName: "Artisan Napoli Pizza Co.",
   },
 ];
 
@@ -89,7 +137,8 @@ const FALLBACK_MENU: MenuItem[] = [
  */
 function MenuContent() {
   const searchParams = useSearchParams();
-  const initialCategory = searchParams.get("category") || "All";
+  const paramCategory = searchParams.get("category");
+  const initialCategory = paramCategory || "All";
   const initialSearch = searchParams.get("search") || "";
 
   const [items, setItems] = useState<MenuItem[]>([]);
@@ -99,6 +148,13 @@ function MenuContent() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | "none">("none");
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
 
+  // Synchronize category if searchParams change dynamically
+  useEffect(() => {
+    if (paramCategory) {
+      setSelectedCategory(paramCategory);
+    }
+  }, [paramCategory]);
+
   useEffect(() => {
     async function fetchMenu() {
       setLoading(true);
@@ -106,22 +162,32 @@ function MenuContent() {
         const queryParams = new URLSearchParams();
         if (search.trim()) queryParams.set("search", search.trim());
         if (selectedCategory && selectedCategory !== "All") queryParams.set("category", selectedCategory);
-        if (sortOrder !== "none") queryParams.set("sort", sortOrder);
+        if (sortOrder !== "none") {
+          queryParams.set("sortBy", "price");
+          queryParams.set("order", sortOrder);
+        }
 
         const response = await apiRequest<{ success: boolean; items: Record<string, unknown>[] }>(
           `/api/menu?${queryParams.toString()}`
         );
 
         if (response.success && response.items && response.items.length > 0) {
-          const mappedItems: MenuItem[] = response.items.map((raw: Partial<MenuItem> & { itemName?: string; images?: string[] }) => ({
+          const mappedItems: MenuItem[] = response.items.map((raw: Record<string, any>) => ({
             _id: String(raw._id),
             name: String(raw.name || raw.itemName || "Artisan Pizza"),
             description: String(raw.description || ""),
             price: Number(raw.price || 14.99),
-            category: String(raw.category || "Special"),
-            image: String(raw.image || (Array.isArray(raw.images) && raw.images[0]) || "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&auto=format&fit=crop&q=80"),
-            rating: Number(raw.rating || 4.9),
+            category: String(raw.category || "Classic Pizzas"),
+            image: String(
+              (Array.isArray(raw.images) && raw.images[0]) ||
+              raw.image ||
+              "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&auto=format&fit=crop&q=80"
+            ),
+            rating: Number(raw.rating || 4.8),
             preparationTime: Number(raw.preparationTime || 15),
+            location: String(raw.location || "Downtown Kitchen, New York"),
+            vendorName: String(raw.vendor?.businessName || raw.vendor?.name || raw.vendorName || "Artisan Pizzeria"),
+            isPremiumVendor: raw.vendor?.subscriptionPlan === "premium",
           }));
           setItems(mappedItems);
         } else if (search.trim() || (selectedCategory && selectedCategory !== "All")) {
@@ -129,7 +195,7 @@ function MenuContent() {
           setItems([]);
         } else {
           // If no items in database, display fallback menu
-          const filtered = [...FALLBACK_MENU];
+          let filtered = [...FALLBACK_MENU];
           if (sortOrder === "asc") {
             filtered.sort((a, b) => a.price - b.price);
           } else if (sortOrder === "desc") {
@@ -139,7 +205,14 @@ function MenuContent() {
         }
       } catch (err) {
         console.warn("[Menu Page] Using fallback menu data:", err);
-        setItems(FALLBACK_MENU);
+        let filtered = [...FALLBACK_MENU];
+        if (selectedCategory && selectedCategory !== "All") {
+          filtered = filtered.filter(i => i.category.toLowerCase() === selectedCategory.toLowerCase());
+        }
+        if (search.trim()) {
+          filtered = filtered.filter(i => i.name.toLowerCase().includes(search.toLowerCase()) || i.description.toLowerCase().includes(search.toLowerCase()));
+        }
+        setItems(filtered);
       } finally {
         setLoading(false);
       }
@@ -303,15 +376,43 @@ function MenuContent() {
                       </div>
                     </div>
 
-                    <p className="text-xs text-stone-500 line-clamp-2 leading-relaxed mb-4">
+                    <p className="text-xs text-stone-500 line-clamp-2 leading-relaxed mb-3">
                       {pizza.description}
                     </p>
+
+                    {/* Meta info: Vendor Info & Location */}
+                    {(pizza.vendorName || pizza.location) && (
+                      <div className="space-y-1.5 py-2.5 border-t border-stone-100">
+                        {pizza.vendorName && (
+                          <div className="flex items-center gap-2 text-xs text-stone-700 font-semibold truncate">
+                            <div className="w-5 h-5 rounded-full bg-amber-100 flex items-center justify-center text-amber-800 shrink-0">
+                              <Store className="w-3 h-3" />
+                            </div>
+                            <span className="truncate">{pizza.vendorName}</span>
+                            {pizza.isPremiumVendor && (
+                              <span className="bg-amber-100 text-amber-800 text-[9px] font-black px-1.5 py-0.5 rounded-md shrink-0 border border-amber-300">
+                                PRO
+                              </span>
+                            )}
+                          </div>
+                        )}
+
+                        {pizza.location && (
+                          <div className="flex items-center gap-2 text-xs text-stone-500 font-medium truncate">
+                            <div className="w-5 h-5 rounded-full bg-red-50 flex items-center justify-center text-[#D91E18] shrink-0">
+                              <MapPin className="w-3 h-3" />
+                            </div>
+                            <span className="truncate">{pizza.location}</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   {/* Footer Action */}
-                  <div className="flex items-center justify-between pt-3 border-t border-stone-100">
+                  <div className="flex items-center justify-between pt-3 border-t border-stone-100 mt-2">
                     <div>
-                      <span className="text-xs text-stone-400 block font-medium">Price</span>
+                      <span className="text-[10px] uppercase font-bold text-stone-400 tracking-wider block">Price</span>
                       <span className="text-lg font-black text-stone-900">
                         ${Number(pizza.price).toFixed(2)}
                       </span>
@@ -320,9 +421,10 @@ function MenuContent() {
                     {/* Links to Protected Item Details Page */}
                     <Link
                       href={`/menu/${pizza._id}`}
-                      className="bg-[#D91E18] hover:bg-[#B91C1C] text-white font-bold text-xs px-4 py-2 rounded-full transition-colors shadow-sm"
+                      className="inline-flex items-center gap-1.5 bg-[#D91E18] hover:bg-[#B91C1C] text-white font-bold text-xs px-4 py-2 rounded-full transition-all transform hover:-translate-y-0.5 shadow-sm shadow-red-500/20"
                     >
-                      Order Now
+                      <span>View Details</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
                   </div>
                 </div>

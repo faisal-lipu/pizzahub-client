@@ -44,7 +44,7 @@ const DEFAULT_FEATURED_PIZZAS: MenuItem[] = [
     name: "Classic Pepperoni Supreme",
     description: "Crispy beef pepperoni, rich San Marzano tomato sauce, and double mozzarella cheese.",
     price: 14.99,
-    category: "Pepperoni",
+    category: "Meat Lovers",
     image: "https://images.unsplash.com/photo-1628840042765-356cda07504e?w=800&auto=format&fit=crop&q=80",
     rating: 4.9,
     preparationTime: 15,
@@ -57,7 +57,7 @@ const DEFAULT_FEATURED_PIZZAS: MenuItem[] = [
     name: "Tuscan Margherita D.O.C.",
     description: "Authentic buffalo mozzarella, sweet cherry tomatoes, extra virgin olive oil, and fresh basil.",
     price: 12.50,
-    category: "Veggie",
+    category: "Classic Pizzas",
     image: "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=800&auto=format&fit=crop&q=80",
     rating: 4.8,
     preparationTime: 12,
@@ -70,7 +70,7 @@ const DEFAULT_FEATURED_PIZZAS: MenuItem[] = [
     name: "Smokey BBQ Chicken Feast",
     description: "Tender roasted chicken strips, hickory BBQ glaze, caramelized red onions, and smoked gouda.",
     price: 16.20,
-    category: "Chicken",
+    category: "Meat Lovers",
     image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&auto=format&fit=crop&q=80",
     rating: 4.9,
     preparationTime: 18,
@@ -83,7 +83,7 @@ const DEFAULT_FEATURED_PIZZAS: MenuItem[] = [
     name: "Quattro Formaggi Deluxe",
     description: "A velvety four-cheese blend of gorgonzola, aged parmesan, fontina, and melted mozzarella.",
     price: 15.00,
-    category: "Cheese",
+    category: "Vegetarian Pizzas",
     image: "https://images.unsplash.com/photo-1573821663912-569905455b1c?w=800&auto=format&fit=crop&q=80",
     rating: 4.7,
     preparationTime: 14,
@@ -96,7 +96,7 @@ const DEFAULT_FEATURED_PIZZAS: MenuItem[] = [
     name: "Truffle Mushroom Special",
     description: "Wild portobello and button mushrooms with aromatic white truffle oil and fresh thyme.",
     price: 17.50,
-    category: "Special",
+    category: "Specialty / Gourmet Pizzas",
     image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&auto=format&fit=crop&q=80",
     rating: 5.0,
     preparationTime: 15,
@@ -109,7 +109,7 @@ const DEFAULT_FEATURED_PIZZAS: MenuItem[] = [
     name: "Spicy Diavola & Jalapeno",
     description: "Calabrian hot salami, roasted red chili peppers, spicy tomato reduction, and fresh herbs.",
     price: 15.80,
-    category: "Pepperoni",
+    category: "Classic Pizzas",
     image: "https://images.unsplash.com/photo-1593560708920-61dd98c46a4e?w=800&auto=format&fit=crop&q=80",
     rating: 4.8,
     preparationTime: 15,
@@ -119,14 +119,58 @@ const DEFAULT_FEATURED_PIZZAS: MenuItem[] = [
   },
 ];
 
-// Interactive Category definitions matching UI mockup
-const CATEGORIES = [
-  { id: "all", label: "All Pizza", icon: "🍕" },
-  { id: "pepperoni", label: "Pepperoni", icon: "🍕" },
-  { id: "veggie", label: "Veggie", icon: "🌿" },
-  { id: "chicken", label: "Chicken", icon: "🍗" },
-  { id: "cheese", label: "Cheese", icon: "🧀" },
-  { id: "special", label: "Special", icon: "⭐" },
+export interface PizzaCategory {
+  id: string;
+  name: string;
+  icon: string;
+  description: string;
+  badge: string;
+}
+
+// Dynamic Section 2: 6 Pizza Categories per Assignment Requirements
+export const PIZZA_CATEGORIES: PizzaCategory[] = [
+  {
+    id: "classic-pizzas",
+    name: "Classic Pizzas",
+    icon: "🍕",
+    description: "Authentic stone-baked crusts, San Marzano marinara & fresh mozzarella.",
+    badge: "Authentic",
+  },
+  {
+    id: "vegetarian-pizzas",
+    name: "Vegetarian Pizzas",
+    icon: "🌿",
+    description: "Garden-fresh vegetables, sweet cherry tomatoes, fresh basil & artisan cheeses.",
+    badge: "Fresh & Green",
+  },
+  {
+    id: "meat-lovers",
+    name: "Meat Lovers",
+    icon: "🥩",
+    description: "Loaded with crispy beef pepperoni, smoky BBQ chicken & spicy Calabrian salami.",
+    badge: "High Protein",
+  },
+  {
+    id: "specialty-gourmet-pizzas",
+    name: "Specialty / Gourmet Pizzas",
+    icon: "⭐",
+    description: "Chef's gourmet recipes featuring white truffle oil, roasted garlic & portobello.",
+    badge: "Chef's Special",
+  },
+  {
+    id: "sides-appetizers",
+    name: "Sides & Appetizers",
+    icon: "🍟",
+    description: "Oven-baked crispy garlic knots, savory dips, mozzarella sticks & seasoned wings.",
+    badge: "Crispy Bites",
+  },
+  {
+    id: "beverages-desserts",
+    name: "Beverages & Desserts",
+    icon: "🥤",
+    description: "Authentic Italian tiramisu, artisan desserts & sparkling Italian blood orange soda.",
+    badge: "Sweet Treats",
+  },
 ];
 
 /**
@@ -316,42 +360,85 @@ export default function HomePage() {
       </section>
 
       {/* ========================================================
-          2. PIZZA CATEGORIES SECTION (Matching Mockup)
+          2. PIZZA CATEGORIES SECTION (Dynamic Section 2: Pizza Categories)
+          - Requirement: Users can explore items by category:
+            1. Classic Pizzas
+            2. Vegetarian Pizzas
+            3. Meat Lovers
+            4. Specialty / Gourmet Pizzas
+            5. Sides & Appetizers
+            6. Beverages & Desserts
          ======================================================== */}
-      <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="text-center mb-8 flex items-center justify-center gap-4">
-          <span className="h-px bg-stone-300 flex-1 max-w-[80px] hidden sm:block" />
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
-            Pizza Categories
-          </h2>
-          <span className="h-px bg-stone-300 flex-1 max-w-[80px] hidden sm:block" />
+      <section className="py-12 md:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-8 gap-4">
+          <div>
+            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#D91E18] uppercase tracking-wider mb-1">
+              <Pizza className="w-3.5 h-3.5" />
+              <span>Explore By Taste</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
+              Pizza Categories
+            </h2>
+            <p className="text-sm text-stone-500 font-medium mt-1">
+              Explore freshly crafted pizzas, gourmet sides, and artisan desserts by category.
+            </p>
+          </div>
+
+          <Link
+            href="/menu"
+            className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-[#D91E18] hover:text-[#B91C1C] transition-colors"
+          >
+            <span>Browse All Menu</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
 
-        {/* Categories Horizontal Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-          {CATEGORIES.map((cat) => {
-            const isSelected = activeCategory === cat.id;
+        {/* 6 Category Interactive Cards Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {PIZZA_CATEGORIES.map((cat) => (
+            <Link
+              key={cat.id}
+              href={`/menu?category=${encodeURIComponent(cat.name)}`}
+              className="group relative bg-white rounded-3xl border border-stone-200/90 hover:border-amber-400 p-5 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden cursor-pointer"
+            >
+              {/* Subtle Ambient Hover Glow */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-amber-100/40 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500 pointer-events-none -z-0" />
 
-            return (
-              <button
-                key={cat.id}
-                type="button"
-                onClick={() => handleCategorySelect(cat.id)}
-                className={`flex flex-col items-center justify-center p-5 rounded-2xl bg-white border transition-all duration-200 cursor-pointer ${
-                  isSelected
-                    ? "border-[#D91E18] shadow-md shadow-red-500/10 scale-105"
-                    : "border-stone-200/80 shadow-xs hover:border-amber-400 hover:shadow-sm"
-                }`}
-              >
-                <div className="w-14 h-14 rounded-2xl bg-amber-50 flex items-center justify-center text-3xl mb-3 shadow-inner">
-                  {cat.icon}
+              <div className="relative z-10">
+                <div className="flex items-start justify-between mb-3.5">
+                  {/* Category Food Icon Box */}
+                  <div className="w-14 h-14 rounded-2xl bg-amber-50 group-hover:bg-amber-100/80 border border-amber-200/60 flex items-center justify-center text-3xl shadow-inner transition-colors">
+                    {cat.icon}
+                  </div>
+
+                  {/* Badge */}
+                  <span className="bg-stone-100 group-hover:bg-red-50 text-stone-600 group-hover:text-[#D91E18] text-[11px] font-bold px-2.5 py-1 rounded-full border border-stone-200/60 group-hover:border-red-200 transition-colors">
+                    {cat.badge}
+                  </span>
                 </div>
-                <span className="text-sm font-bold text-stone-800">
-                  {cat.label}
+
+                {/* Category Title */}
+                <h3 className="text-lg font-black text-stone-900 group-hover:text-[#D91E18] transition-colors tracking-tight">
+                  {cat.name}
+                </h3>
+
+                {/* Category Description */}
+                <p className="text-xs text-stone-500 line-clamp-2 leading-relaxed mt-1.5 mb-4">
+                  {cat.description}
+                </p>
+              </div>
+
+              {/* Action Link Footer */}
+              <div className="relative z-10 pt-3 border-t border-stone-100 flex items-center justify-between text-xs font-bold text-stone-700 group-hover:text-[#D91E18] transition-colors">
+                <span className="inline-flex items-center gap-1">
+                  Explore {cat.name.split(" ")[0]}
                 </span>
-              </button>
-            );
-          })}
+                <span className="w-7 h-7 rounded-full bg-stone-100 group-hover:bg-[#D91E18] group-hover:text-white flex items-center justify-center transition-all transform group-hover:translate-x-0.5 shadow-2xs">
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </span>
+              </div>
+            </Link>
+          ))}
         </div>
       </section>
 
