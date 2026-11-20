@@ -18,7 +18,12 @@ import {
   Sparkles,
   MapPin,
   Store,
+  ChefHat,
+  Truck,
+  CheckCircle2,
+  ShoppingBag,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { apiRequest } from "@/lib/api";
 import PizzaImage from "@/components/PizzaImage";
 
@@ -173,6 +178,86 @@ export const PIZZA_CATEGORIES: PizzaCategory[] = [
   },
 ];
 
+// Required Extra Section: Why Choose PizzaHub? (Key Benefits)
+const BENEFITS = [
+  {
+    icon: Flame,
+    title: "Artisan Woodfire Taste",
+    description: "48-hour cold-fermented sourdough baked at 450°C on fiery stone slabs for that authentic blistered crust.",
+    tag: "Authentic Neapolitan",
+    bgClass: "bg-red-50",
+    colorClass: "text-[#D91E18]",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Admin Verified Kitchens",
+    description: "Every vendor pizzeria and recipe undergoes rigorous quality inspection for hygiene and food standards.",
+    tag: "100% Quality Vetted",
+    bgClass: "bg-amber-50",
+    colorClass: "text-amber-700",
+  },
+  {
+    icon: Clock,
+    title: "15-Minute Fast Dispatch",
+    description: "Orders travel straight from the stone oven into insulated heat-lock carriers without unnecessary wait time.",
+    tag: "Lightning Fast Speed",
+    bgClass: "bg-emerald-50",
+    colorClass: "text-emerald-700",
+  },
+  {
+    icon: ChefHat,
+    title: "Fresh Farm Ingredients",
+    description: "100% whole milk mozzarella, authentic San Marzano D.O.P. tomatoes, and aromatic cold-pressed olive oil.",
+    tag: "Zero Artificial Flavors",
+    bgClass: "bg-blue-50",
+    colorClass: "text-blue-700",
+  },
+];
+
+// Extra Section: How PizzaHub Works (Simple 3-Step Process)
+const HOW_IT_WORKS_STEPS = [
+  {
+    icon: ShoppingBag,
+    title: "1. Pick Your Pizza",
+    description: "Explore handcrafted artisan pizzas, gourmet sides, and chilled desserts from top local pizzerias.",
+    tip: "Browse by category or search toppings",
+  },
+  {
+    icon: Flame,
+    title: "2. Baked in 450°C Stone Ovens",
+    description: "Certified chefs hand-toss your dough and bake it to fiery perfection the moment you order.",
+    tip: "Freshly prepared every single time",
+  },
+  {
+    icon: Truck,
+    title: "3. Fast & Steaming Delivery",
+    description: "Dedicated couriers deliver your pizza in heat-preserving thermal bags right to your doorstep.",
+    tip: "Contactless & hot on arrival",
+  },
+];
+
+// Extra Section: Customer Testimonials (Social Proof)
+const TESTIMONIALS = [
+  {
+    name: "Sophia Chen",
+    role: "Verified Foodie • Brooklyn, NY",
+    quote: "The crust is out of this world — crispy, airy, and with that distinct woodfire flavor you only get in Naples. PizzaHub is now our weekly family tradition!",
+    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
+  },
+  {
+    name: "Marcus Sterling",
+    role: "Food Blogger • Manhattan, NY",
+    quote: "PizzaHub connects me with local artisan pizzerias I never knew existed. The Truffle Mushroom Special is hands down the best gourmet pizza in NYC.",
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80",
+  },
+  {
+    name: "Elena Rostova",
+    role: "Pizza Enthusiast • Queens, NY",
+    quote: "Fastest delivery ever! Arrived in under 20 minutes steaming hot, cheese still bubbling. Ordering was effortless, and the quality is unbeatable.",
+    avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200&auto=format&fit=crop&q=80",
+  },
+];
+
 /**
  * Public Home Page Component
  * Renders Hero section, Pizza Categories, and Featured Menu Items
@@ -251,8 +336,13 @@ export default function HomePage() {
         <div className="absolute inset-0 pointer-events-none opacity-[0.03] -z-10 bg-[radial-gradient(#D91E18_1px,transparent_1px)] [background-size:20px_20px]" />
 
         <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-          {/* Left Text Column */}
-          <div className="lg:col-span-7 space-y-3.5 sm:space-y-4">
+          {/* Left Text Column with Motion */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="lg:col-span-7 space-y-3.5 sm:space-y-4"
+          >
             {/* PizzaHub Fresh Kicker */}
             <div className="inline-flex items-center gap-1.5 bg-amber-50 border border-amber-200/80 px-3 py-1 rounded-full shadow-2xs">
               <span className="font-serif italic text-xs font-bold text-amber-700 tracking-wide">
@@ -311,10 +401,15 @@ export default function HomePage() {
                 <p className="text-[10px] font-semibold text-stone-500 uppercase">Customer Love</p>
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          {/* Right Visual Column (Compact & Refined Pizza Composition) */}
-          <div className="lg:col-span-5 relative flex items-center justify-center">
+          {/* Right Visual Column with Motion */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.15, ease: "easeOut" }}
+            className="lg:col-span-5 relative flex items-center justify-center"
+          >
             {/* Background Warm Sunburst Shape */}
             <div className="absolute w-60 sm:w-72 h-60 sm:h-72 rounded-full bg-gradient-to-tr from-amber-400/30 via-amber-200/30 to-red-100/20 blur-xl -z-10" />
 
@@ -355,7 +450,7 @@ export default function HomePage() {
                 </span>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -365,7 +460,13 @@ export default function HomePage() {
           - Displays: item image, name, category, price, location, vendor info, View Details button
          ======================================================== */}
       <section className="py-14 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-8 gap-4">
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.4 }}
+          className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-8 gap-4"
+        >
           <div>
             <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#D91E18] uppercase tracking-wider mb-1">
               <Sparkles className="w-3.5 h-3.5" />
@@ -386,16 +487,21 @@ export default function HomePage() {
             <span>View All Menu</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
-        </div>
+        </motion.div>
 
-        {/* Featured Menu Items Grid */}
+        {/* Featured Menu Items Grid with Motion Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {featuredPizzas.map((pizza) => {
             const isFav = Boolean(favorites[pizza._id]);
 
             return (
-              <div
+              <motion.div
                 key={pizza._id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4 }}
+                whileHover={{ y: -6, transition: { duration: 0.2 } }}
                 className="group bg-white rounded-3xl border border-stone-200/80 overflow-hidden shadow-xs hover:shadow-xl hover:border-amber-300 transition-all duration-300 flex flex-col justify-between"
               >
                 {/* 1. Item Image Container */}
@@ -500,7 +606,7 @@ export default function HomePage() {
                     </Link>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
         </div>
@@ -517,7 +623,13 @@ export default function HomePage() {
             6. Beverages & Desserts
          ======================================================== */}
       <section className="py-12 md:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-8 gap-4">
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.4 }}
+          className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-8 gap-4"
+        >
           <div>
             <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#D91E18] uppercase tracking-wider mb-1">
               <Pizza className="w-3.5 h-3.5" />
@@ -538,101 +650,269 @@ export default function HomePage() {
             <span>Browse All Menu</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
-        </div>
+        </motion.div>
 
-        {/* 6 Category Interactive Cards Grid */}
+        {/* 6 Category Interactive Cards Grid with Motion */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {PIZZA_CATEGORIES.map((cat) => (
-            <Link
+          {PIZZA_CATEGORIES.map((cat, idx) => (
+            <motion.div
               key={cat.id}
-              href={`/menu?category=${encodeURIComponent(cat.name)}`}
-              className="group relative bg-white rounded-3xl border border-stone-200/90 hover:border-amber-400 p-5 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden cursor-pointer"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: idx * 0.08 }}
+              whileHover={{ y: -6, transition: { duration: 0.2 } }}
+              className="h-full"
             >
-              {/* Subtle Ambient Hover Glow */}
-              <div className="absolute top-0 right-0 w-32 h-32 bg-amber-100/40 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500 pointer-events-none -z-0" />
+              <Link
+                href={`/menu?category=${encodeURIComponent(cat.name)}`}
+                className="group relative bg-white rounded-3xl border border-stone-200/90 hover:border-amber-400 p-5 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden cursor-pointer h-full"
+              >
+                {/* Subtle Ambient Hover Glow */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-amber-100/40 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500 pointer-events-none -z-0" />
 
-              <div className="relative z-10">
-                <div className="flex items-start justify-between mb-3.5">
-                  {/* Category Food Icon Box */}
-                  <div className="w-14 h-14 rounded-2xl bg-amber-50 group-hover:bg-amber-100/80 border border-amber-200/60 flex items-center justify-center text-3xl shadow-inner transition-colors">
-                    {cat.icon}
+                <div className="relative z-10">
+                  <div className="flex items-start justify-between mb-3.5">
+                    {/* Category Food Icon Box */}
+                    <div className="w-14 h-14 rounded-2xl bg-amber-50 group-hover:bg-amber-100/80 border border-amber-200/60 flex items-center justify-center text-3xl shadow-inner transition-colors">
+                      {cat.icon}
+                    </div>
+
+                    {/* Badge */}
+                    <span className="bg-stone-100 group-hover:bg-red-50 text-stone-600 group-hover:text-[#D91E18] text-[11px] font-bold px-2.5 py-1 rounded-full border border-stone-200/60 group-hover:border-red-200 transition-colors">
+                      {cat.badge}
+                    </span>
                   </div>
 
-                  {/* Badge */}
-                  <span className="bg-stone-100 group-hover:bg-red-50 text-stone-600 group-hover:text-[#D91E18] text-[11px] font-bold px-2.5 py-1 rounded-full border border-stone-200/60 group-hover:border-red-200 transition-colors">
-                    {cat.badge}
-                  </span>
+                  {/* Category Title */}
+                  <h3 className="text-lg font-black text-stone-900 group-hover:text-[#D91E18] transition-colors tracking-tight">
+                    {cat.name}
+                  </h3>
+
+                  {/* Category Description */}
+                  <p className="text-xs text-stone-500 line-clamp-2 leading-relaxed mt-1.5 mb-4">
+                    {cat.description}
+                  </p>
                 </div>
 
-                {/* Category Title */}
-                <h3 className="text-lg font-black text-stone-900 group-hover:text-[#D91E18] transition-colors tracking-tight">
-                  {cat.name}
-                </h3>
-
-                {/* Category Description */}
-                <p className="text-xs text-stone-500 line-clamp-2 leading-relaxed mt-1.5 mb-4">
-                  {cat.description}
-                </p>
-              </div>
-
-              {/* Action Link Footer */}
-              <div className="relative z-10 pt-3 border-t border-stone-100 flex items-center justify-between text-xs font-bold text-stone-700 group-hover:text-[#D91E18] transition-colors">
-                <span className="inline-flex items-center gap-1">
-                  Explore {cat.name.split(" ")[0]}
-                </span>
-                <span className="w-7 h-7 rounded-full bg-stone-100 group-hover:bg-[#D91E18] group-hover:text-white flex items-center justify-center transition-all transform group-hover:translate-x-0.5 shadow-2xs">
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </span>
-              </div>
-            </Link>
+                {/* Action Link Footer */}
+                <div className="relative z-10 pt-3 border-t border-stone-100 flex items-center justify-between text-xs font-bold text-stone-700 group-hover:text-[#D91E18] transition-colors">
+                  <span className="inline-flex items-center gap-1">
+                    Explore {cat.name.split(" ")[0]}
+                  </span>
+                  <span className="w-7 h-7 rounded-full bg-stone-100 group-hover:bg-[#D91E18] group-hover:text-white flex items-center justify-center transition-all transform group-hover:translate-x-0.5 shadow-2xs">
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </span>
+                </div>
+              </Link>
+            </motion.div>
           ))}
         </div>
       </section>
 
       {/* ========================================================
-          4. WHY CHOOSE PIZZAHUB? (Value Proposition)
+          4. EXTRA SECTION 1 (REQUIRED): WHY CHOOSE PIZZAHUB? (Benefits)
          ======================================================== */}
-      <section className="py-16 bg-white border-y border-stone-200/60">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
-              Why PizzaHub Stands Out
+      <section className="py-16 md:py-24 bg-white border-y border-stone-200/60 relative overflow-hidden">
+        {/* Subtle Ambient Background */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-tr from-amber-100/40 via-red-50/20 to-transparent rounded-full blur-3xl pointer-events-none -z-0" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="text-center max-w-2xl mx-auto mb-14"
+          >
+            <div className="inline-flex items-center gap-1.5 bg-red-50 border border-red-200 text-[#D91E18] text-xs font-bold px-3.5 py-1 rounded-full mb-3 shadow-2xs">
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>The PizzaHub Advantage</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-stone-900 tracking-tight">
+              Why Choose PizzaHub?
             </h2>
-            <p className="text-sm text-stone-500 font-medium mt-2">
-              We connect passionate local pizza chefs directly with hungry foodies.
+            <p className="text-sm text-stone-600 font-medium mt-2.5 leading-relaxed">
+              We connect authentic artisan pizza kitchens directly with pizza lovers. Handcrafted ingredients, certified pizzerias, and fiery oven heat in every single bite.
             </p>
+          </motion.div>
+
+          {/* 4 Benefits Cards Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {BENEFITS.map((b, idx) => (
+              <motion.div
+                key={b.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: idx * 0.1 }}
+                whileHover={{ y: -6, transition: { duration: 0.2 } }}
+                className="bg-[#FAF8F5] rounded-3xl p-6 border border-stone-200/80 hover:border-amber-300 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
+              >
+                <div>
+                  <div className={`w-14 h-14 rounded-2xl ${b.bgClass} ${b.colorClass} flex items-center justify-center mb-5 shadow-inner transition-transform group-hover:scale-110 duration-300`}>
+                    <b.icon className="w-7 h-7" />
+                  </div>
+                  <h3 className="text-base font-bold text-stone-900 mb-2 group-hover:text-[#D91E18] transition-colors">
+                    {b.title}
+                  </h3>
+                  <p className="text-xs text-stone-600 leading-relaxed font-medium">
+                    {b.description}
+                  </p>
+                </div>
+                <div className="mt-5 pt-4 border-t border-stone-200/60 flex items-center gap-1.5 text-[11px] font-bold text-stone-500">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>{b.tag}</span>
+                </div>
+              </motion.div>
+            ))}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="p-6 rounded-3xl bg-[#FAF8F5] border border-stone-200/80 text-center space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-red-100 text-[#D91E18] flex items-center justify-center mx-auto">
-                <Clock className="w-6 h-6" />
-              </div>
-              <h3 className="text-base font-bold text-stone-900">15-Minute Fast Dispatch</h3>
-              <p className="text-xs text-stone-500 leading-relaxed">
-                Our kitchen partners bake hot and fast, dispatching in record time directly to your door.
-              </p>
+          {/* Metrics Highlight Banner */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="mt-12 bg-gradient-to-r from-stone-900 via-stone-800 to-stone-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl grid grid-cols-2 md:grid-cols-4 gap-6 text-center"
+          >
+            <div>
+              <p className="text-2xl sm:text-3xl font-black text-amber-400">100%</p>
+              <p className="text-xs text-stone-300 font-semibold mt-1">Real Whole Mozzarella</p>
             </div>
+            <div>
+              <p className="text-2xl sm:text-3xl font-black text-amber-400">450°C</p>
+              <p className="text-xs text-stone-300 font-semibold mt-1">Stone Oven Baking</p>
+            </div>
+            <div>
+              <p className="text-2xl sm:text-3xl font-black text-amber-400">15 min</p>
+              <p className="text-xs text-stone-300 font-semibold mt-1">Average Dispatch Speed</p>
+            </div>
+            <div>
+              <p className="text-2xl sm:text-3xl font-black text-amber-400">4.9 ★</p>
+              <p className="text-xs text-stone-300 font-semibold mt-1">From 50,000+ Foodies</p>
+            </div>
+          </motion.div>
+        </div>
+      </section>
 
-            <div className="p-6 rounded-3xl bg-[#FAF8F5] border border-stone-200/80 text-center space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center mx-auto">
-                <ShieldCheck className="w-6 h-6" />
-              </div>
-              <h3 className="text-base font-bold text-stone-900">Admin Verified Pizzerias</h3>
-              <p className="text-xs text-stone-500 leading-relaxed">
-                Every vendor menu item undergoes quality review by platform administrators before publication.
-              </p>
-            </div>
+      {/* ========================================================
+          5. EXTRA SECTION 2: HOW PIZZAHUB WORKS (Step-by-Step Flow)
+         ======================================================== */}
+      <section className="py-16 md:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="text-center max-w-2xl mx-auto mb-14"
+        >
+          <div className="inline-flex items-center gap-1.5 bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold px-3.5 py-1 rounded-full mb-3">
+            <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+            <span>Simple 3-Step Process</span>
+          </div>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-stone-900 tracking-tight">
+            How PizzaHub Works
+          </h2>
+          <p className="text-sm text-stone-500 font-medium mt-2">
+            Getting fiery hot, authentic woodfire pizza to your table is easier than ever.
+          </p>
+        </motion.div>
 
-            <div className="p-6 rounded-3xl bg-[#FAF8F5] border border-stone-200/80 text-center space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
-                <Flame className="w-6 h-6" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+          {HOW_IT_WORKS_STEPS.map((step, idx) => (
+            <motion.div
+              key={step.title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: idx * 0.15 }}
+              whileHover={{ y: -6, transition: { duration: 0.2 } }}
+              className="bg-white rounded-3xl p-7 border border-stone-200/90 shadow-xs hover:shadow-xl hover:border-amber-300 transition-all duration-300 relative flex flex-col justify-between group"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-6">
+                  <div className="w-14 h-14 rounded-2xl bg-red-50 text-[#D91E18] flex items-center justify-center font-bold shadow-inner group-hover:scale-110 transition-transform">
+                    <step.icon className="w-7 h-7" />
+                  </div>
+                  <span className="text-2xl font-black text-stone-200 group-hover:text-red-200 transition-colors">
+                    0{idx + 1}
+                  </span>
+                </div>
+
+                <h3 className="text-lg font-bold text-stone-900 mb-2 group-hover:text-[#D91E18] transition-colors">
+                  {step.title}
+                </h3>
+                <p className="text-xs text-stone-500 leading-relaxed font-medium">
+                  {step.description}
+                </p>
               </div>
-              <h3 className="text-base font-bold text-stone-900">Artisan Woodfire Taste</h3>
-              <p className="text-xs text-stone-500 leading-relaxed">
-                Slow-fermented 48-hour sourdough dough baked on fiery stone slabs for that authentic blistered crust.
-              </p>
+
+              <div className="mt-6 pt-4 border-t border-stone-100 flex items-center gap-2 text-xs font-bold text-[#D91E18]">
+                <span>{step.tip}</span>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* ========================================================
+          6. EXTRA SECTION 3: CUSTOMER TESTIMONIALS (Social Proof)
+         ======================================================== */}
+      <section className="py-16 md:py-20 bg-[#FAF8F5] border-t border-stone-200/60">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="text-center max-w-2xl mx-auto mb-14"
+          >
+            <div className="inline-flex items-center gap-1.5 bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold px-3.5 py-1 rounded-full mb-3">
+              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+              <span>Real Reviews</span>
             </div>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-stone-900 tracking-tight">
+              Loved by Foodies Everywhere
+            </h2>
+            <p className="text-sm text-stone-500 font-medium mt-2">
+              See what our community of pizza lovers say about their PizzaHub dining experience.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {TESTIMONIALS.map((t, idx) => (
+              <motion.div
+                key={t.name}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: idx * 0.1 }}
+                whileHover={{ y: -6, transition: { duration: 0.2 } }}
+                className="bg-white rounded-3xl p-6 border border-stone-200/80 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center gap-1 text-amber-400 mb-3">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-amber-400" />
+                    ))}
+                  </div>
+                  <p className="text-xs sm:text-sm text-stone-700 leading-relaxed font-medium italic mb-6">
+                    &ldquo;{t.quote}&rdquo;
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-3 pt-4 border-t border-stone-100">
+                  <div className="w-10 h-10 rounded-full overflow-hidden relative border border-stone-200 shrink-0">
+                    <img src={t.avatar} alt={t.name} className="w-full h-full object-cover" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-stone-900 leading-tight">{t.name}</p>
+                    <p className="text-[10px] font-medium text-stone-400">{t.role}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
