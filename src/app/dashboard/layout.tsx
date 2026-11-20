@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -130,10 +131,19 @@ export default function DashboardLayout({
         {/* Mobile Header with Hamburger Toggle */}
         <div className="md:hidden bg-white border-b border-stone-200 px-4 py-3 flex items-center justify-between sticky top-0 z-40">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-[#D91E18] flex items-center justify-center text-white font-black text-sm shadow-sm">
-              🍕
+            <div className="relative w-8 h-8 rounded-xl overflow-hidden shrink-0 shadow-xs border border-stone-200/60 bg-white">
+              <Image
+                src="/pizzahub-logo.webp"
+                alt="PizzaHub Logo"
+                fill
+                sizes="32px"
+                className="object-contain"
+                priority
+              />
             </div>
-            <span className="font-extrabold text-stone-900 tracking-tight text-base">PizzaHub</span>
+            <span className="font-extrabold text-stone-900 tracking-tight text-base">
+              Pizza<span className="text-[#D91E18]">Hub</span>
+            </span>
           </Link>
 
           <button
@@ -156,13 +166,20 @@ export default function DashboardLayout({
           <div className="p-6">
             {/* Logo */}
             <div className="flex items-center justify-between pb-6 border-b border-stone-100">
-              <Link href="/" className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-2xl bg-[#D91E18] flex items-center justify-center text-white shadow-md shadow-red-500/20">
-                  <Pizza className="w-5 h-5" />
+              <Link href="/" className="flex items-center gap-2.5 group">
+                <div className="relative w-10 h-10 rounded-2xl overflow-hidden shrink-0 shadow-sm border border-stone-200/70 bg-white">
+                  <Image
+                    src="/pizzahub-logo.webp"
+                    alt="PizzaHub Logo"
+                    fill
+                    sizes="40px"
+                    className="object-contain"
+                    priority
+                  />
                 </div>
                 <div>
                   <span className="font-black text-stone-900 text-lg tracking-tight block leading-tight">
-                    PizzaHub
+                    Pizza<span className="text-[#D91E18]">Hub</span>
                   </span>
                   <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 block">
                     Control Panel
