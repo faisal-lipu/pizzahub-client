@@ -262,14 +262,14 @@ export default function Navbar() {
             {isAuthenticated && user ? (
               <Link
                 href={getDashboardHref()}
-                className="hidden sm:inline-block bg-[#D91E18] hover:bg-[#B91C1C] text-white font-semibold px-6 py-2.5 rounded-3xl transition-colors text-sm shadow-sm"
+                className="hidden sm:inline-block bg-[#D91E18] hover:bg-[#B91C1C] text-white font-semibold px-6 py-2.5 rounded-l-2xl transition-colors text-sm shadow-sm"
               >
                 Dashboard
               </Link>
             ) : (
               <Link
                 href="/sign-in"
-                className="bg-[#D91E18] hover:bg-[#B91C1C] text-white font-semibold px-6 py-2.5 rounded-2xl transition-colors text-sm shadow-sm"
+                className="bg-[#D91E18] hover:bg-[#B91C1C] text-white font-semibold px-6 py-2.5 rounded-l-2xl transition-colors text-sm shadow-sm"
               >
                 Sign In
               </Link>

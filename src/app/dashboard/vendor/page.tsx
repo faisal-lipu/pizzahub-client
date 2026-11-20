@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import PizzaImage from "@/components/PizzaImage";
+import ConfirmModal from "@/components/ConfirmModal";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { useAuth } from "@/context/AuthContext";
 import { apiRequest } from "@/lib/api";
@@ -63,6 +64,7 @@ function VendorDashboardContent() {
   const [prepTime, setPrepTime] = useState("15");
   const [addingItem, setAddingItem] = useState(false);
   const [actionInProgress, setActionInProgress] = useState<string | null>(null);
+  const [deleteConfirmItem, setDeleteConfirmItem] = useState<{ id: string; name: string } | null>(null);
 
   const fetchVendorData = async () => {
     try {
@@ -162,18 +164,25 @@ function VendorDashboardContent() {
     }
   };
 
-  // Delete Item
-  const handleDeleteItem = async (itemId: string) => {
-    if (!confirm("Are you sure you want to remove this pizza from your menu?")) return;
+  // Prompt deletion using custom modal
+  const promptDeleteItem = (item: MenuItem) => {
+    setDeleteConfirmItem({ id: item._id, name: item.name });
+  };
+
+  // Perform actual delete after user confirms in modal
+  const handleConfirmDelete = async () => {
+    if (!deleteConfirmItem) return;
 
     try {
-      setActionInProgress(itemId);
-      const response = await apiRequest<{ success: boolean; message: string }>(`/api/menu/${itemId}`, {
-        method: "DELETE",
-      });
+      setActionInProgress(deleteConfirmItem.id);
+      const response = await apiRequest<{ success: boolean; message: string }>(
+        `/api/menu/${deleteConfirmItem.id}`,
+        { method: "DELETE" }
+      );
 
       if (response.success) {
-        toast.success("Menu item removed.");
+        toast.success(`"${deleteConfirmItem.name}" has been removed from your menu.`);
+        setDeleteConfirmItem(null);
         fetchVendorData();
       } else {
         toast.error(response.message || "Failed to delete item.");
@@ -447,8 +456,8 @@ function VendorDashboardContent() {
                     <button
                       type="button"
                       disabled={actionInProgress === item._id}
-                      onClick={() => handleDeleteItem(item._id)}
-                      className="p-1.5 rounded-lg text-stone-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                      onClick={() => promptDeleteItem(item)}
+                      className="p-1.5 rounded-lg text-stone-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
                       aria-label="Delete pizza"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -731,6 +740,19 @@ function VendorDashboardContent() {
           </div>
         </div>
       )}
+
+      {/* Custom Centered Confirmation Modal */}
+      <ConfirmModal
+        isOpen={Boolean(deleteConfirmItem)}
+        title="Remove Pizza from Menu?"
+        message={`Are you sure you want to permanently delete "${deleteConfirmItem?.name || "this pizza"}" from your restaurant menu? This action cannot be undone.`}
+        confirmText="Yes, Remove"
+        cancelText="Cancel"
+        variant="danger"
+        isLoading={Boolean(actionInProgress)}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setDeleteConfirmItem(null)}
+      />
     </div>
   );
 }

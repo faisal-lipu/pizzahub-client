@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import ConfirmModal from "@/components/ConfirmModal";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { useAuth } from "@/context/AuthContext";
 import { apiRequest } from "@/lib/api";
@@ -57,6 +58,7 @@ function CustomerDashboardContent() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"overview" | "orders">("overview");
   const [cancellingId, setCancellingId] = useState<string | null>(null);
+  const [cancelConfirmId, setCancelConfirmId] = useState<string | null>(null);
 
   const fetchOrders = async () => {
     try {
@@ -116,18 +118,23 @@ function CustomerDashboardContent() {
     };
   }, []);
 
-  const handleCancelOrder = async (orderId: string) => {
-    if (!confirm("Are you sure you want to cancel this pending order?")) return;
+  const promptCancelOrder = (orderId: string) => {
+    setCancelConfirmId(orderId);
+  };
+
+  const handleConfirmCancelOrder = async () => {
+    if (!cancelConfirmId) return;
 
     try {
-      setCancellingId(orderId);
+      setCancellingId(cancelConfirmId);
       const response = await apiRequest<{ success: boolean; message: string }>(
-        `/api/orders/${orderId}/cancel`,
+        `/api/orders/${cancelConfirmId}/cancel`,
         { method: "PATCH" }
       );
 
       if (response.success) {
         toast.success("Order cancelled successfully.");
+        setCancelConfirmId(null);
         fetchOrders();
       } else {
         toast.error(response.message || "Could not cancel order.");
@@ -398,7 +405,7 @@ function CustomerDashboardContent() {
                       <button
                         type="button"
                         disabled={cancellingId === order._id}
-                        onClick={() => handleCancelOrder(order._id)}
+                        onClick={() => promptCancelOrder(order._id)}
                         className="px-3.5 py-1.5 rounded-full border border-red-200 text-xs font-bold text-[#D91E18] hover:bg-red-50 transition-colors disabled:opacity-50 cursor-pointer"
                       >
                         {cancellingId === order._id ? "Cancelling..." : "Cancel Order"}
@@ -411,6 +418,19 @@ function CustomerDashboardContent() {
           )}
         </div>
       )}
+
+      {/* Custom Centered Confirmation Modal */}
+      <ConfirmModal
+        isOpen={Boolean(cancelConfirmId)}
+        title="Cancel This Order?"
+        message="Are you sure you want to cancel this pending pizza order? This action cannot be reversed."
+        confirmText="Yes, Cancel Order"
+        cancelText="Keep Order"
+        variant="danger"
+        isLoading={Boolean(cancellingId)}
+        onConfirm={handleConfirmCancelOrder}
+        onCancel={() => setCancelConfirmId(null)}
+      />
     </div>
   );
 }
