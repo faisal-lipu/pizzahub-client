@@ -169,7 +169,7 @@ export default function SignUpPage() {
           <Link href="/" className="inline-flex items-center gap-3">
             <div className="relative w-12 h-12 rounded-full overflow-hidden shrink-0">
               <Image
-                src="/pizzahub-logo.png"
+                src="/pizzahub-logo.webp"
                 alt="PizzaHub Logo"
                 fill
                 sizes="48px"

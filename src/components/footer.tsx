@@ -19,7 +19,7 @@ export default function Footer() {
             <Link href="/" className="inline-flex items-center gap-3 group">
               <div className="relative w-11 h-11 rounded-full overflow-hidden shrink-0 bg-white/10 p-0.5">
                 <Image
-                  src="/pizzahub-logo.png"
+                  src="/pizzahub-logo.webp"
                   alt="PizzaHub Logo"
                   fill
                   sizes="44px"

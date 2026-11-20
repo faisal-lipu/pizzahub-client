@@ -100,7 +100,7 @@ export default function Navbar() {
             >
               <div className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-full overflow-hidden flex-shrink-0 transition-transform group-hover:scale-105">
                 <Image
-                  src="/pizzahub-logo.png"
+                  src="/pizzahub-logo.webp"
                   alt="PizzaHub Logo"
                   fill
                   sizes="(max-width: 640px) 40px, 44px"
