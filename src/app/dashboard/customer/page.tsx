@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams, useRouter } from "next/navigation";
 import PizzaImage from "@/components/PizzaImage";
 import ConfirmModal from "@/components/ConfirmModal";
 import { useAuth } from "@/context/AuthContext";
@@ -68,9 +69,26 @@ interface RawOrderResponse {
 
 function CustomerDashboardInner() {
   const { user } = useAuth();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get("tab") as "overview" | "orders" | null;
+
   const [orders, setOrders] = useState<CustomerOrder[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"overview" | "orders">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "orders">(
+    tabParam === "orders" ? "orders" : "overview"
+  );
+
+  useEffect(() => {
+    if (tabParam === "orders" || tabParam === "overview") {
+      setActiveTab(tabParam);
+    }
+  }, [tabParam]);
+
+  const handleTabChange = (tab: "overview" | "orders") => {
+    setActiveTab(tab);
+    router.replace(`/dashboard/customer?tab=${tab}`);
+  };
 
   // View Order Details Modal State
   const [viewingOrder, setViewingOrder] = useState<CustomerOrder | null>(null);
@@ -263,7 +281,7 @@ function CustomerDashboardInner() {
       <div className="flex items-center gap-2">
         <button
           type="button"
-          onClick={() => setActiveTab("overview")}
+          onClick={() => handleTabChange("overview")}
           className={`px-5 py-2.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
             activeTab === "overview"
               ? "bg-stone-900 text-white shadow-sm"
@@ -274,7 +292,7 @@ function CustomerDashboardInner() {
         </button>
         <button
           type="button"
-          onClick={() => setActiveTab("orders")}
+          onClick={() => handleTabChange("orders")}
           className={`px-5 py-2.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
             activeTab === "orders"
               ? "bg-stone-900 text-white shadow-sm"
@@ -322,7 +340,7 @@ function CustomerDashboardInner() {
               <h2 className="text-lg font-black text-stone-900">Recent Pizza Orders</h2>
               <button
                 type="button"
-                onClick={() => setActiveTab("orders")}
+                onClick={() => handleTabChange("orders")}
                 className="text-xs font-bold text-[#D91E18] hover:underline"
               >
                 View all orders &rarr;

@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { useAuth } from "@/context/AuthContext";
 import UserAvatar from "@/components/UserAvatar";
@@ -50,7 +50,7 @@ export default function DashboardLayout({
           label: "My Menu Items",
           href: "/dashboard/vendor?tab=menu",
           icon: Pizza,
-          active: pathname === "/dashboard/vendor" && false,
+          active: false,
         },
         {
           label: "Add Menu Item",
@@ -99,10 +99,16 @@ export default function DashboardLayout({
     // Default: Customer
     return [
       {
-        label: "My Orders",
-        href: "/dashboard/customer",
-        icon: ShoppingBag,
+        label: "Overview",
+        href: "/dashboard/customer?tab=overview",
+        icon: Store,
         active: pathname === "/dashboard/customer",
+      },
+      {
+        label: "My Orders",
+        href: "/dashboard/customer?tab=orders",
+        icon: ShoppingBag,
+        active: false,
       },
       {
         label: "Browse Menu",
