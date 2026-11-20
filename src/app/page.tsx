@@ -16,8 +16,11 @@ import {
   X,
   Pizza,
   Sparkles,
+  MapPin,
+  Store,
 } from "lucide-react";
 import { apiRequest } from "@/lib/api";
+import PizzaImage from "@/components/PizzaImage";
 
 interface MenuItem {
   _id: string;
@@ -28,6 +31,10 @@ interface MenuItem {
   image?: string;
   rating?: number;
   preparationTime?: number;
+  location?: string;
+  vendorName?: string;
+  vendorImage?: string | null;
+  isPremiumVendor?: boolean;
 }
 
 // Fallback featured pizzas when database has fresh empty state
@@ -41,6 +48,9 @@ const DEFAULT_FEATURED_PIZZAS: MenuItem[] = [
     image: "https://images.unsplash.com/photo-1628840042765-356cda07504e?w=800&auto=format&fit=crop&q=80",
     rating: 4.9,
     preparationTime: 15,
+    location: "Little Italy, New York",
+    vendorName: "Artisan Napoli Pizza Co.",
+    isPremiumVendor: true,
   },
   {
     _id: "demo-2",
@@ -51,6 +61,9 @@ const DEFAULT_FEATURED_PIZZAS: MenuItem[] = [
     image: "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=800&auto=format&fit=crop&q=80",
     rating: 4.8,
     preparationTime: 12,
+    location: "SoHo, Manhattan",
+    vendorName: "Bella Italia Ristorante",
+    isPremiumVendor: true,
   },
   {
     _id: "demo-3",
@@ -61,6 +74,9 @@ const DEFAULT_FEATURED_PIZZAS: MenuItem[] = [
     image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&auto=format&fit=crop&q=80",
     rating: 4.9,
     preparationTime: 18,
+    location: "Williamsburg, Brooklyn",
+    vendorName: "Brooklyn Slice House",
+    isPremiumVendor: false,
   },
   {
     _id: "demo-4",
@@ -71,6 +87,9 @@ const DEFAULT_FEATURED_PIZZAS: MenuItem[] = [
     image: "https://images.unsplash.com/photo-1573821663912-569905455b1c?w=800&auto=format&fit=crop&q=80",
     rating: 4.7,
     preparationTime: 14,
+    location: "Greenwich Village, NY",
+    vendorName: "Roma Woodfire Pizzeria",
+    isPremiumVendor: true,
   },
   {
     _id: "demo-5",
@@ -81,6 +100,9 @@ const DEFAULT_FEATURED_PIZZAS: MenuItem[] = [
     image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&auto=format&fit=crop&q=80",
     rating: 5.0,
     preparationTime: 15,
+    location: "Upper East Side, NY",
+    vendorName: "Milano Gourmet Pizza",
+    isPremiumVendor: true,
   },
   {
     _id: "demo-6",
@@ -91,6 +113,9 @@ const DEFAULT_FEATURED_PIZZAS: MenuItem[] = [
     image: "https://images.unsplash.com/photo-1593560708920-61dd98c46a4e?w=800&auto=format&fit=crop&q=80",
     rating: 4.8,
     preparationTime: 15,
+    location: "DUMBO, Brooklyn",
+    vendorName: "Venezia Pizzeria",
+    isPremiumVendor: false,
   },
 ];
 
@@ -121,15 +146,23 @@ export default function HomePage() {
       try {
         const response = await apiRequest<{ success: boolean; items: Record<string, unknown>[] }>("/api/menu?limit=6");
         if (response.success && response.items && response.items.length > 0) {
-          const mappedItems: MenuItem[] = response.items.map((raw: Partial<MenuItem> & { itemName?: string; images?: string[] }) => ({
+          const mappedItems: MenuItem[] = response.items.map((raw: Record<string, any>) => ({
             _id: String(raw._id),
             name: String(raw.name || raw.itemName || "Artisan Pizza"),
             description: String(raw.description || ""),
             price: Number(raw.price || 14.99),
             category: String(raw.category || "Special"),
-            image: String(raw.image || (Array.isArray(raw.images) && raw.images[0]) || "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&auto=format&fit=crop&q=80"),
-            rating: Number(raw.rating || 4.9),
+            image: String(
+              (Array.isArray(raw.images) && raw.images[0]) ||
+              raw.image ||
+              "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&auto=format&fit=crop&q=80"
+            ),
+            rating: Number(raw.rating || 4.8),
             preparationTime: Number(raw.preparationTime || 15),
+            location: String(raw.location || "Downtown Kitchen, New York"),
+            vendorName: String(raw.vendor?.businessName || raw.vendor?.name || raw.vendorName || "Artisan Pizzeria"),
+            vendorImage: raw.vendor?.image || null,
+            isPremiumVendor: raw.vendor?.subscriptionPlan === "premium",
           }));
           setFeaturedPizzas(mappedItems);
         }
@@ -323,29 +356,35 @@ export default function HomePage() {
       </section>
 
       {/* ========================================================
-          3. FEATURED PIZZAS SECTION
+          3. FEATURED MENU ITEMS SECTION (Dynamic Section 1)
+          - Shows at least 6 approved items from database
+          - Displays: item image, name, category, price, location, vendor info, View Details button
          ======================================================== */}
       <section className="py-14 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-8 gap-4">
           <div>
+            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#D91E18] uppercase tracking-wider mb-1">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Chef&apos;s Handcrafted Picks</span>
+            </div>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
-              Featured Pizzas
+              Featured Menu Items
             </h2>
             <p className="text-sm text-stone-500 font-medium mt-1">
-              Discover our most loved pizzas crafted by artisan chefs.
+              Discover our top chef-crafted pizzas, freshly baked and delivered to your doorstep.
             </p>
           </div>
 
           <Link
             href="/menu"
-            className="inline-flex items-center gap-2 border border-[#D91E18] text-[#D91E18] hover:bg-[#D91E18] hover:text-white font-bold text-sm px-5 py-2.5 rounded-full transition-all"
+            className="inline-flex items-center gap-2 border border-[#D91E18] text-[#D91E18] hover:bg-[#D91E18] hover:text-white font-bold text-sm px-5 py-2.5 rounded-full transition-all shrink-0 cursor-pointer"
           >
-            View All Menu
+            <span>View All Menu</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 
-        {/* Featured Pizzas Grid */}
+        {/* Featured Menu Items Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {featuredPizzas.map((pizza) => {
             const isFav = Boolean(favorites[pizza._id]);
@@ -353,20 +392,20 @@ export default function HomePage() {
             return (
               <div
                 key={pizza._id}
-                className="group bg-white rounded-3xl border border-stone-200/80 overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
+                className="group bg-white rounded-3xl border border-stone-200/80 overflow-hidden shadow-xs hover:shadow-xl hover:border-amber-300 transition-all duration-300 flex flex-col justify-between"
               >
-                {/* Image Container */}
+                {/* 1. Item Image Container */}
                 <div className="relative w-full h-52 overflow-hidden bg-stone-100">
-                  <Image
-                    src={pizza.image || "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&auto=format&fit=crop&q=80"}
+                  <PizzaImage
+                    src={pizza.image}
                     alt={pizza.name}
                     fill
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
 
-                  {/* Category Pill Tag */}
-                  <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-md text-stone-800 text-xs font-bold px-3 py-1 rounded-full shadow-sm">
+                  {/* 3. Category Pill Tag */}
+                  <span className="absolute top-3 left-3 bg-white/95 backdrop-blur-md text-stone-800 text-xs font-bold px-3 py-1 rounded-full shadow-xs border border-stone-200/60">
                     {pizza.category}
                   </span>
 
@@ -374,7 +413,7 @@ export default function HomePage() {
                   <button
                     type="button"
                     onClick={(e) => toggleFavorite(pizza._id, e)}
-                    className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-stone-600 hover:text-[#D91E18] shadow-sm transition-colors cursor-pointer"
+                    className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/95 backdrop-blur-md flex items-center justify-center text-stone-600 hover:text-[#D91E18] shadow-xs transition-colors cursor-pointer"
                     aria-label="Add to favorites"
                   >
                     <Heart
@@ -385,39 +424,75 @@ export default function HomePage() {
                   </button>
                 </div>
 
-                {/* Content */}
+                {/* Card Content */}
                 <div className="p-5 flex-1 flex flex-col justify-between">
                   <div>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <h3 className="text-base font-bold text-stone-900 group-hover:text-[#D91E18] transition-colors truncate">
+                    {/* 2. Item Name & Rating */}
+                    <div className="flex items-center justify-between mb-1.5 gap-2">
+                      <h3
+                        className="text-base font-bold text-stone-900 group-hover:text-[#D91E18] transition-colors truncate"
+                        title={pizza.name}
+                      >
                         {pizza.name}
                       </h3>
-                      <div className="flex items-center gap-1 text-xs font-bold text-amber-500 shrink-0">
+                      <div className="flex items-center gap-1 text-xs font-bold text-amber-500 shrink-0 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/60">
                         <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                        <span>{pizza.rating || 4.8}</span>
+                        <span>{pizza.rating ? pizza.rating.toFixed(1) : "4.8"}</span>
                       </div>
                     </div>
 
-                    <p className="text-xs text-stone-500 line-clamp-2 leading-relaxed mb-4">
+                    {/* Short Description */}
+                    <p className="text-xs text-stone-500 line-clamp-2 leading-relaxed mb-3">
                       {pizza.description}
                     </p>
+
+                    {/* Meta info: Vendor Info & Location */}
+                    <div className="space-y-1.5 py-2.5 border-t border-stone-100">
+                      {/* 6. Vendor Info */}
+                      <div className="flex items-center gap-2 text-xs text-stone-700 font-semibold truncate">
+                        <div className="w-5 h-5 rounded-full bg-amber-100 flex items-center justify-center text-amber-800 shrink-0">
+                          <Store className="w-3 h-3" />
+                        </div>
+                        <span className="truncate" title={pizza.vendorName || "Artisan Kitchen"}>
+                          {pizza.vendorName || "Artisan Kitchen"}
+                        </span>
+                        {pizza.isPremiumVendor && (
+                          <span className="bg-amber-100 text-amber-800 text-[9px] font-black px-1.5 py-0.5 rounded-md shrink-0 border border-amber-300">
+                            PRO
+                          </span>
+                        )}
+                      </div>
+
+                      {/* 5. Location (restaurant area / city) */}
+                      <div className="flex items-center gap-2 text-xs text-stone-500 font-medium truncate">
+                        <div className="w-5 h-5 rounded-full bg-red-50 flex items-center justify-center text-[#D91E18] shrink-0">
+                          <MapPin className="w-3 h-3" />
+                        </div>
+                        <span className="truncate" title={pizza.location || "Downtown, New York"}>
+                          {pizza.location || "Downtown, New York"}
+                        </span>
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Footer Action */}
-                  <div className="flex items-center justify-between pt-3 border-t border-stone-100">
+                  {/* Footer Action: 4. Price & 7. View Details Button */}
+                  <div className="flex items-center justify-between pt-3 border-t border-stone-100 mt-2">
                     <div>
-                      <span className="text-xs text-stone-400 block font-medium">Price</span>
+                      <span className="text-[10px] uppercase font-bold text-stone-400 tracking-wider block">
+                        Price
+                      </span>
                       <span className="text-lg font-black text-stone-900">
                         ${Number(pizza.price).toFixed(2)}
                       </span>
                     </div>
 
-                    {/* Order / View Details Link (Private page: prompts login if not logged in) */}
+                    {/* 7. View Details Link */}
                     <Link
                       href={`/menu/${pizza._id}`}
-                      className="bg-[#D91E18] hover:bg-[#B91C1C] text-white font-bold text-xs px-4 py-2 rounded-full transition-colors shadow-sm"
+                      className="inline-flex items-center gap-1.5 bg-[#D91E18] hover:bg-[#B91C1C] text-white font-bold text-xs px-4 py-2 rounded-full shadow-sm shadow-red-500/20 transition-all transform hover:-translate-y-0.5 cursor-pointer"
                     >
-                      Order Now
+                      <span>View Details</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
                   </div>
                 </div>
