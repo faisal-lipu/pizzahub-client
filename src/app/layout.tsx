@@ -31,11 +31,11 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${montserrat.variable} h-full antialiased`}
     >
-      <body className={`${montserrat.className} min-h-full flex flex-col bg-stone-50 dark:bg-stone-950 text-stone-900 dark:text-stone-100 font-sans overflow-x-hidden w-full max-w-full transition-colors duration-200`}>
+      <body className={`${montserrat.className} min-h-full flex flex-col bg-stone-50 dark:bg-stone-950 text-stone-900 dark:text-stone-100 font-sans overflow-x-clip w-full max-w-full transition-colors duration-200`}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <AuthProvider>
             <Navbar />
-            <main className="flex-1 w-full max-w-full overflow-x-hidden">{children}</main>
+            <main className="flex-1 w-full max-w-full overflow-x-clip">{children}</main>
             <Footer />
             <Toaster richColors position="top-right" />
           </AuthProvider>

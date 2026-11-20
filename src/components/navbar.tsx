@@ -38,6 +38,16 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [favCount, setFavCount] = useState(0);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 15);
+    };
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useEffect(() => {
     setFavCount(getFavoriteItems().length);
@@ -98,7 +108,13 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full py-3 sm:py-4 px-4 sm:px-6 lg:px-8 max-w-full overflow-hidden">
+      <header
+        className={`sticky top-0 z-50 w-full transition-all duration-300 px-4 sm:px-6 lg:px-8 max-w-full ${
+          isScrolled
+            ? "py-2 sm:py-2.5 backdrop-blur-md bg-[#FAF8F5]/85 dark:bg-[#0c0a09]/85 shadow-xs border-b border-stone-200/50 dark:border-stone-800/50"
+            : "py-3 sm:py-4 bg-transparent"
+        }`}
+      >
         {/* ========================================================
             DESKTOP NAVBAR (md and above): Floating Split-Pill Design
            ======================================================== */}

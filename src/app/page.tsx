@@ -353,7 +353,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5] text-stone-900 overflow-x-hidden">
+    <div className="min-h-screen bg-[#FAF8F5] text-stone-900 overflow-x-clip">
       {/* ========================================================
           1. BANNER SECTION (Hero Banner per Assignment Requirements)
           - Clear headline: "Hot & Fresh Pizza Delivered to Your Door"
