@@ -1,13 +1,21 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --midnight: #000000;
   --deep-blue: #10377a;
   --gold: #fab703;
   --tomato: #a9201d;
   --dark-red: #632727;
-  --background: #ffffff;
-  --foreground: #000000;
+  --background: #faf8f5;
+  --foreground: #1c1917;
+}
+
+.dark {
+  --background: #0c0a09;
+  --foreground: #f5f5f4;
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -24,6 +32,87 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-montserrat), sans-serif;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* ========================================================
+   GLOBAL ARTISAN DARK THEME SYSTEM
+   Transforms all cards, backgrounds, borders, and typography
+   ======================================================== */
+.dark body {
+  background-color: #0c0a09;
+  color: #f5f5f4;
+}
+
+/* Background overrides in dark mode */
+.dark .bg-\[\#FAF8F5\],
+.dark .bg-stone-50 {
+  background-color: #0c0a09 !important;
+}
+
+.dark .bg-white {
+  background-color: #1c1917 !important;
+  color: #f5f5f4;
+}
+
+.dark .bg-stone-100 {
+  background-color: #292524 !important;
+}
+
+/* Border overrides in dark mode */
+.dark .border-stone-200,
+.dark .border-stone-200\/90,
+.dark .border-stone-200\/80,
+.dark .border-stone-200\/70,
+.dark .border-stone-200\/60,
+.dark .border-stone-100,
+.dark .border-gray-100,
+.dark .border-gray-200 {
+  border-color: #292524 !important;
+}
+
+/* Text overrides in dark mode */
+.dark .text-stone-900,
+.dark .text-\[\#111827\],
+.dark .text-stone-800,
+.dark .text-\[\#1F2937\] {
+  color: #fafaf9 !important;
+}
+
+.dark .text-stone-700,
+.dark .text-\[\#4A1515\] {
+  color: #e7e5e4 !important;
+}
+
+.dark .text-stone-600 {
+  color: #a8a29e !important;
+}
+
+.dark .text-stone-500 {
+  color: #a8a29e !important;
+}
+
+/* Form inputs & controls in dark mode */
+.dark input:not([type="checkbox"]):not([type="radio"]),
+.dark textarea,
+.dark select {
+  background-color: #171412 !important;
+  color: #f5f5f4 !important;
+  border-color: #292524 !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #78716c !important;
+}
+
+/* Subtle shadows in dark mode */
+.dark .shadow-xs,
+.dark .shadow-sm,
+.dark .shadow-md,
+.dark .shadow-xl,
+.dark .shadow-2xl {
+  box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.6) !important;
 }
 
 .navbar {

@@ -3,6 +3,7 @@ import { Montserrat } from "next/font/google";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { AuthProvider } from "@/context/AuthContext";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import { Toaster } from "sonner";
 import "./globals.css";
 
@@ -27,15 +28,18 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${montserrat.variable} h-full antialiased`}
     >
-      <body className={`${montserrat.className} min-h-full flex flex-col bg-stone-50 text-stone-900 font-sans overflow-x-hidden w-full max-w-full`}>
-        <AuthProvider>
-          <Navbar />
-          <main className="flex-1 w-full max-w-full overflow-x-hidden">{children}</main>
-          <Footer />
-          <Toaster richColors position="top-right" />
-        </AuthProvider>
+      <body className={`${montserrat.className} min-h-full flex flex-col bg-stone-50 dark:bg-stone-950 text-stone-900 dark:text-stone-100 font-sans overflow-x-hidden w-full max-w-full transition-colors duration-200`}>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+          <AuthProvider>
+            <Navbar />
+            <main className="flex-1 w-full max-w-full overflow-x-hidden">{children}</main>
+            <Footer />
+            <Toaster richColors position="top-right" />
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

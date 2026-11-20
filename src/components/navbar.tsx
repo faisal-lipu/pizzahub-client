@@ -17,6 +17,7 @@ import {
   Heart,
 } from "lucide-react";
 import UserAvatar from "./UserAvatar";
+import ThemeToggle from "./ThemeToggle";
 import { getFavoriteItems } from "@/lib/favorites";
 
 
@@ -191,6 +192,9 @@ export default function Navbar() {
               )}
             </Link>
 
+            {/* 1.75. Dark / Light Mode Toggle */}
+            <ThemeToggle />
+
             {/* 2. Divider */}
             <div className="h-5 w-[1px] bg-gray-200" aria-hidden="true" />
 
@@ -356,6 +360,9 @@ export default function Navbar() {
               )}
             </Link>
 
+            {/* Mobile Theme Toggle */}
+            <ThemeToggle className="w-8 h-8" />
+
             {/* User Profile or Sign In Link */}
             {isAuthenticated && user ? (
               <Link
@@ -420,6 +427,12 @@ export default function Navbar() {
                     </Link>
                   );
                 })}
+              </div>
+
+              {/* Theme Mode Toggle Row */}
+              <div className="border-t border-gray-100 dark:border-stone-800 pt-3 flex items-center justify-between px-4 py-1">
+                <span className="text-xs font-bold text-stone-600 dark:text-stone-300">Appearance Mode</span>
+                <ThemeToggle />
               </div>
 
               {isAuthenticated && user ? (
