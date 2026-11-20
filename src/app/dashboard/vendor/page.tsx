@@ -1120,63 +1120,110 @@ function VendorDashboardInner() {
             </p>
           </div>
 
+          {/* Active Premium Banner if vendor already upgraded */}
+          {!isFreePlan && (
+            <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-stone-900 via-stone-800 to-black text-white shadow-md border border-amber-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-in fade-in">
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-400 shrink-0 shadow-inner">
+                  <Crown className="w-6 h-6 fill-amber-400" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-black text-white tracking-tight">Premium Vendor Membership Active</h3>
+                    <span className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider text-emerald-300 bg-emerald-950/80 border border-emerald-500/40 px-2 py-0.5 rounded-full">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                      Active
+                    </span>
+                  </div>
+                  <p className="text-xs text-stone-300 mt-0.5">
+                    You have unlocked unlimited menu items, verified chef badge, and featured homepage showcase.
+                  </p>
+                </div>
+              </div>
+              <div className="shrink-0">
+                <span className="text-xs font-bold text-amber-300 bg-amber-950/60 px-3 py-1.5 rounded-full border border-amber-500/30">
+                  $19.99/mo (Auto-renewing)
+                </span>
+              </div>
+            </div>
+          )}
+
           {/* Subscription Comparison Table per Rubric */}
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse border border-stone-200 rounded-2xl overflow-hidden">
+            <table className="w-full border-collapse border border-stone-200 rounded-2xl overflow-hidden shadow-xs">
               <thead>
                 <tr className="bg-stone-50 border-b border-stone-200 text-left">
-                  <th className="py-3.5 px-5 text-xs font-black uppercase text-stone-700 tracking-wider">Plan</th>
-                  <th className="py-3.5 px-5 text-xs font-black uppercase text-stone-700 tracking-wider">What you get</th>
-                  <th className="py-3.5 px-5 text-xs font-black uppercase text-stone-700 tracking-wider text-right">Status</th>
+                  <th className="py-4 px-6 text-xs font-black uppercase text-stone-700 tracking-wider">Plan</th>
+                  <th className="py-4 px-6 text-xs font-black uppercase text-stone-700 tracking-wider">What you get</th>
+                  <th className="py-4 px-6 text-xs font-black uppercase text-stone-700 tracking-wider text-right w-48 whitespace-nowrap">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-200 text-sm">
                 {/* Free Plan */}
-                <tr className={!isFreePlan ? "opacity-60" : "bg-white"}>
-                  <td className="py-4 px-5 font-bold text-stone-900">
-                    <span className="block text-base">Free</span>
+                <tr className={!isFreePlan ? "opacity-60 bg-stone-50/30" : "bg-white"}>
+                  <td className="py-5 px-6 font-bold text-stone-900">
+                    <span className="block text-base font-black">Free</span>
                     <span className="text-xs text-stone-400 font-normal">$0 / forever</span>
                   </td>
-                  <td className="py-4 px-5 text-xs text-stone-600">
+                  <td className="py-5 px-6 text-xs text-stone-600 leading-relaxed">
                     Max 3 active menu items, basic vendor dashboard, order management
                   </td>
-                  <td className="py-4 px-5 text-right">
+                  <td className="py-5 px-6 text-right w-48 whitespace-nowrap">
                     {isFreePlan ? (
-                      <span className="text-xs font-bold text-stone-600 bg-stone-100 px-3 py-1 rounded-full">
-                        Current Plan
-                      </span>
+                      <div className="flex justify-end">
+                        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-stone-700 bg-stone-100 px-3.5 py-1.5 rounded-full border border-stone-200 whitespace-nowrap">
+                          <span className="w-2 h-2 rounded-full bg-stone-400"></span>
+                          <span>Current Plan</span>
+                        </span>
+                      </div>
                     ) : (
-                      <span className="text-xs text-stone-400">—</span>
+                      <span className="text-xs text-stone-300 font-bold">—</span>
                     )}
                   </td>
                 </tr>
 
                 {/* Premium Plan */}
-                <tr className={!isFreePlan ? "bg-amber-50/40" : "bg-white"}>
-                  <td className="py-4 px-5 font-bold text-stone-900">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-base text-amber-700">Premium</span>
-                      <Crown className="w-4 h-4 text-amber-500 fill-amber-500" />
+                <tr className={!isFreePlan ? "bg-gradient-to-r from-amber-50/70 via-yellow-50/30 to-amber-50/70 border-l-4 border-l-amber-500" : "bg-white"}>
+                  <td className="py-5 px-6 font-bold text-stone-900">
+                    <div className="flex items-center gap-2">
+                      <span className="text-base font-black text-stone-900">Premium</span>
+                      <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-amber-800 bg-amber-100 px-2 py-0.5 rounded-md border border-amber-300/80">
+                        <Crown className="w-3 h-3 text-amber-600 fill-amber-500" />
+                        PRO
+                      </span>
                     </div>
-                    <span className="text-xs text-stone-400 font-normal">$19.99 / month</span>
+                    <span className="text-xs text-stone-500 font-semibold">$19.99 / month</span>
                   </td>
-                  <td className="py-4 px-5 text-xs text-stone-700 font-medium">
+                  <td className="py-5 px-6 text-xs text-stone-700 font-medium leading-relaxed">
                     Unlimited active items, Premium vendor badge, featured menu placement, all Free features
                   </td>
-                  <td className="py-4 px-5 text-right">
+                  <td className="py-5 px-6 text-right w-48 whitespace-nowrap">
                     {!isFreePlan ? (
-                      <span className="text-xs font-bold text-amber-800 bg-amber-100 px-3 py-1 rounded-full border border-amber-300">
-                        Active Plan
-                      </span>
+                      /* Ultra-Premium Luxury Active Plan Badge */
+                      <div className="flex justify-end">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-stone-950 via-stone-800 to-black text-white text-xs font-black shadow-lg shadow-stone-900/20 border border-amber-400/60 whitespace-nowrap">
+                          <span className="relative flex h-2.5 w-2.5 shrink-0">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400"></span>
+                          </span>
+                          <Crown className="w-3.5 h-3.5 text-amber-400 fill-amber-400 shrink-0" />
+                          <span className="bg-gradient-to-r from-amber-200 via-amber-300 to-yellow-100 bg-clip-text text-transparent font-black tracking-wide text-xs">
+                            Active Plan
+                          </span>
+                        </div>
+                      </div>
                     ) : (
-                      <button
-                        type="button"
-                        disabled={actionInProgress === "stripe-checkout"}
-                        onClick={handleUpgradeSubscription}
-                        className="px-5 py-2 rounded-full bg-[#D91E18] hover:bg-[#B91C1C] text-white font-bold text-xs shadow-md shadow-red-500/20 cursor-pointer transition-all"
-                      >
-                        {actionInProgress === "stripe-checkout" ? "Loading..." : "Upgrade to Premium"}
-                      </button>
+                      <div className="flex justify-end">
+                        <button
+                          type="button"
+                          disabled={actionInProgress === "stripe-checkout"}
+                          onClick={handleUpgradeSubscription}
+                          className="px-5 py-2.5 rounded-full bg-[#D91E18] hover:bg-[#B91C1C] text-white font-black text-xs shadow-md shadow-red-500/20 cursor-pointer transition-all flex items-center gap-1.5 whitespace-nowrap"
+                        >
+                          <Crown className="w-3.5 h-3.5" />
+                          <span>{actionInProgress === "stripe-checkout" ? "Loading..." : "Upgrade to Premium"}</span>
+                        </button>
+                      </div>
                     )}
                   </td>
                 </tr>
