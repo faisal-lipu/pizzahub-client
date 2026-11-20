@@ -19,10 +19,12 @@ export const auth = betterAuth({
       clientId:
         process.env.GOOGLE_CLIENT_ID ||
         process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
-        "103456789012-samplegoogleclientid.apps.googleusercontent.com",
+        process.env.BETTER_AUTH_GOOGLE_CLIENT_ID ||
+        "",
       clientSecret:
         process.env.GOOGLE_CLIENT_SECRET ||
-        "GOCSPX-samplegoogleclientsecretkey",
+        process.env.BETTER_AUTH_GOOGLE_SECRET ||
+        "",
     },
   },
   plugins: [
