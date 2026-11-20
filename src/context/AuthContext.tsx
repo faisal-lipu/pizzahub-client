@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
 
 export interface User {
   _id: string;
@@ -22,6 +23,7 @@ interface AuthContextType {
   logout: () => void;
   updateUser: (updatedUser: Partial<User>) => void;
   isAuthenticated: boolean;
+  authClient: typeof authClient;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -80,6 +82,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
 
+    // Clear Better Auth session if present
+    authClient.signOut().catch(() => {});
+
     window.dispatchEvent(new Event("authStateChange"));
     router.push("/sign-in");
   };
@@ -103,6 +108,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         logout,
         updateUser,
         isAuthenticated: Boolean(token && user),
+        authClient,
       }}
     >
       {children}
