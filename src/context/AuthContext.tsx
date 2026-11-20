@@ -11,6 +11,8 @@ export interface User {
   role: "customer" | "vendor" | "admin";
   image?: string | null;
   businessName?: string | null;
+  phone?: string | null;
+  address?: string | null;
   subscriptionPlan?: "free" | "premium";
   subscriptionExpiresAt?: string | null;
   subscriptionStatus?: string;

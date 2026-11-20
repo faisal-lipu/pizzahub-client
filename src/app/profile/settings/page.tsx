@@ -5,13 +5,30 @@ import Link from "next/link";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { useAuth } from "@/context/AuthContext";
 import { apiRequest } from "@/lib/api";
+import { uploadToImgBB } from "@/lib/imgbb";
 import { toast } from "sonner";
-import { User as UserIcon, Mail, Store, Shield, Camera, Save, Loader2, ArrowLeft } from "lucide-react";
+import {
+  User as UserIcon,
+  Mail,
+  Store,
+  Shield,
+  Camera,
+  Save,
+  Loader2,
+  ArrowLeft,
+  Phone,
+  MapPin,
+  Lock,
+  UploadCloud,
+  CheckCircle2,
+} from "lucide-react";
 import UserAvatar from "@/components/UserAvatar";
 
 /**
  * Profile Settings Component
- * Allows authenticated users to view and update their profile details
+ * Vendors and Customers can update their name, profile image (optional),
+ * and other editable information (phone, address, businessName), with success and error messages.
+ * Users must NOT be able to change their own role or subscription status through profile updates.
  */
 function ProfileSettingsContent() {
   const { user, updateUser } = useAuth();
@@ -19,7 +36,34 @@ function ProfileSettingsContent() {
   const [name, setName] = useState(user?.name || "");
   const [image, setImage] = useState(user?.image || "");
   const [businessName, setBusinessName] = useState(user?.businessName || "");
+  const [phone, setPhone] = useState(user?.phone || "");
+  const [address, setAddress] = useState(user?.address || "");
+
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  // Direct image file upload via ImgBB
+  const handleImageFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select a valid image file (.jpg, .png, .webp).");
+      return;
+    }
+
+    try {
+      setUploadingImage(true);
+      const uploadedUrl = await uploadToImgBB(file);
+      setImage(uploadedUrl);
+      toast.success("Profile photo uploaded to ImgBB successfully!");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to upload image.";
+      toast.error(msg);
+    } finally {
+      setUploadingImage(false);
+    }
+  };
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,7 +77,7 @@ function ProfileSettingsContent() {
       setSaving(true);
 
       let cleanImage = image.trim();
-      // If user pasted a webpage link from ShowTV, auto-resolve to direct image
+      // Auto-resolve known actor / demo image pages to direct asset links
       if (cleanImage.includes("showtv.com.tr/oyuncu/burak-deniz")) {
         cleanImage = "https://im.showtv.com.tr/5/6155/burak-deniz-500x500.png";
         setImage(cleanImage);
@@ -42,6 +86,8 @@ function ProfileSettingsContent() {
       const updateData: Record<string, string> = {
         name: name.trim(),
         image: cleanImage,
+        phone: phone.trim(),
+        address: address.trim(),
       };
 
       if (user?.role === "vendor") {
@@ -86,44 +132,50 @@ function ProfileSettingsContent() {
         Back to Dashboard
       </Link>
 
-      <div className="bg-white rounded-3xl border border-stone-200/90 shadow-sm p-6 sm:p-10">
-        <div className="border-b border-stone-100 pb-6 mb-6">
+      <div className="bg-white rounded-3xl border border-stone-200/90 shadow-sm p-6 sm:p-10 space-y-8">
+        {/* Header */}
+        <div className="border-b border-stone-100 pb-6">
           <h1 className="text-2xl font-black text-stone-900">Profile Settings</h1>
           <p className="text-sm text-stone-500 font-medium mt-1">
-            Manage your personal profile and account credentials
+            Update your personal name, profile picture, and contact information
           </p>
         </div>
 
-        <form onSubmit={handleSaveProfile} className="space-y-6">
-          {/* Avatar Preview */}
-          <div className="flex items-center gap-5">
+        {/* Security Rule Notice: Non-modifiable Role and Subscription */}
+        <div className="bg-stone-50 rounded-2xl p-4 sm:p-5 border border-stone-200/70 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
             <UserAvatar
               src={image}
               name={name || user?.name}
-              size="xl"
-              className="border-2 border-stone-200 shadow-inner"
+              size="lg"
+              isPremium={user?.subscriptionPlan === "premium"}
             />
-
             <div>
               <p className="text-sm font-bold text-stone-900">{user?.name || "User"}</p>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="inline-flex items-center gap-1 text-[11px] uppercase font-bold px-2.5 py-0.5 rounded-full bg-red-50 text-[#D91E18] border border-red-100">
+              <p className="text-xs text-stone-500 font-medium">{user?.email}</p>
+              <div className="flex flex-wrap items-center gap-2 mt-1.5">
+                <span className="inline-flex items-center gap-1 text-[10px] uppercase font-bold px-2.5 py-0.5 rounded-full bg-red-50 text-[#D91E18] border border-red-200">
                   <Shield className="w-3 h-3" />
                   Role: {user?.role}
                 </span>
-                {user?.subscriptionPlan && (
-                  <span className="text-[11px] uppercase font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
-                    Plan: {user.subscriptionPlan}
-                  </span>
-                )}
+                <span className="inline-flex items-center gap-1 text-[10px] uppercase font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
+                  Plan: {user?.subscriptionPlan === "premium" ? "Premium 👑" : "Free"}
+                </span>
               </div>
             </div>
           </div>
 
+          <div className="flex items-center gap-1.5 text-[11px] font-semibold text-stone-500 bg-white px-3 py-1.5 rounded-xl border border-stone-200 shadow-2xs">
+            <Lock className="w-3.5 h-3.5 text-stone-400" />
+            <span>Role & Subscription are locked</span>
+          </div>
+        </div>
+
+        <form onSubmit={handleSaveProfile} className="space-y-6">
           {/* Full Name */}
           <div>
             <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
-              Full Name
+              Full Name <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <input
@@ -131,6 +183,7 @@ function ProfileSettingsContent() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
+                placeholder="Your full name"
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 text-sm focus:outline-none focus:border-[#D91E18] text-stone-900"
               />
               <UserIcon className="w-4 h-4 text-stone-400 absolute left-3.5 top-3.5" />
@@ -152,31 +205,57 @@ function ProfileSettingsContent() {
               <Mail className="w-4 h-4 text-stone-400 absolute left-3.5 top-3.5" />
             </div>
             <p className="text-[11px] text-stone-400 mt-1">
-              Account email cannot be modified for security and order verification reasons.
+              Account email cannot be modified for order security and verification.
             </p>
           </div>
 
-          {/* Profile Image URL */}
-          <div>
-            <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
-              Avatar Image URL
+          {/* Profile Image (URL or ImgBB File Upload) */}
+          <div className="space-y-2">
+            <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider">
+              Profile Photo (Optional)
             </label>
-            <div className="relative">
-              <input
-                type="url"
-                value={image}
-                onChange={(e) => setImage(e.target.value)}
-                placeholder="https://images.unsplash.com/photo-... or direct .jpg/.png URL"
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 text-sm focus:outline-none focus:border-[#D91E18] text-stone-900"
-              />
-              <Camera className="w-4 h-4 text-stone-400 absolute left-3.5 top-3.5" />
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Option A: Direct File Upload to ImgBB */}
+              <label className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-dashed border-stone-300 hover:border-[#D91E18] bg-stone-50/50 hover:bg-red-50/20 text-xs font-bold text-stone-700 hover:text-[#D91E18] cursor-pointer transition-all">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageFileUpload}
+                  disabled={uploadingImage}
+                  className="hidden"
+                />
+                {uploadingImage ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin text-[#D91E18]" />
+                    <span>Uploading to ImgBB...</span>
+                  </>
+                ) : (
+                  <>
+                    <UploadCloud className="w-4 h-4" />
+                    <span>Upload from Device (ImgBB)</span>
+                  </>
+                )}
+              </label>
+
+              {/* Option B: Direct URL Input */}
+              <div className="relative">
+                <input
+                  type="url"
+                  value={image}
+                  onChange={(e) => setImage(e.target.value)}
+                  placeholder="Or paste direct image URL"
+                  className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-stone-200 text-xs focus:outline-none focus:border-[#D91E18] text-stone-900"
+                />
+                <Camera className="w-3.5 h-3.5 text-stone-400 absolute left-3 top-3" />
+              </div>
             </div>
-            <p className="text-[11px] text-stone-500 mt-1">
-              Direct image link (ending in .jpg, .png, .webp, or hosted on ImgBB / Unsplash). Please do not paste a website page link.
+            <p className="text-[11px] text-stone-400">
+              Upload any picture from your device or paste an image URL.
             </p>
           </div>
 
-          {/* Vendor Business Name (Conditional) */}
+          {/* Conditional Vendor Restaurant Name */}
           {user?.role === "vendor" && (
             <div>
               <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
@@ -187,7 +266,7 @@ function ProfileSettingsContent() {
                   type="text"
                   value={businessName}
                   onChange={(e) => setBusinessName(e.target.value)}
-                  placeholder="Artisan Napoli Pizza"
+                  placeholder="e.g. Napoli Artisan Kitchen"
                   className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 text-sm focus:outline-none focus:border-[#D91E18] text-stone-900"
                 />
                 <Store className="w-4 h-4 text-stone-400 absolute left-3.5 top-3.5" />
@@ -195,12 +274,46 @@ function ProfileSettingsContent() {
             </div>
           )}
 
+          {/* Optional Phone Number */}
+          <div>
+            <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
+              Phone Number (Optional)
+            </label>
+            <div className="relative">
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="+1 (555) 000-0000"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 text-sm focus:outline-none focus:border-[#D91E18] text-stone-900"
+              />
+              <Phone className="w-4 h-4 text-stone-400 absolute left-3.5 top-3.5" />
+            </div>
+          </div>
+
+          {/* Optional Delivery / Kitchen Address */}
+          <div>
+            <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
+              {user?.role === "vendor" ? "Kitchen / Store Location" : "Default Delivery Address"} (Optional)
+            </label>
+            <div className="relative">
+              <input
+                type="text"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder="Street address, city, state"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 text-sm focus:outline-none focus:border-[#D91E18] text-stone-900"
+              />
+              <MapPin className="w-4 h-4 text-stone-400 absolute left-3.5 top-3.5" />
+            </div>
+          </div>
+
           {/* Submit Button */}
           <div className="pt-4 border-t border-stone-100 flex justify-end">
             <button
               type="submit"
-              disabled={saving}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#D91E18] hover:bg-[#B91C1C] text-white font-bold text-sm shadow-md shadow-red-500/20 transition-all cursor-pointer disabled:opacity-50"
+              disabled={saving || uploadingImage}
+              className="inline-flex items-center gap-2 px-7 py-3 rounded-full bg-[#D91E18] hover:bg-[#B91C1C] text-white font-bold text-sm shadow-md shadow-red-500/20 transition-all cursor-pointer disabled:opacity-50"
             >
               {saving ? (
                 <>
