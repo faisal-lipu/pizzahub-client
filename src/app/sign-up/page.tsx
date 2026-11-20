@@ -138,47 +138,37 @@ export default function SignUpPage() {
     try {
       setGoogleLoading(true);
 
-      // Attempt Better Auth social authentication
+      // Store chosen role in localStorage so it persists after Google OAuth callback
+      if (typeof window !== "undefined") {
+        localStorage.setItem("pending_signup_role", role);
+        if (role === "vendor" && businessName.trim()) {
+          localStorage.setItem("pending_business_name", businessName.trim());
+        }
+      }
+
+      // 1. Trigger Better Auth Google social authentication
       const result = await authClient.signIn.social({
         provider: "google",
         callbackURL: role === "vendor" ? "/dashboard/vendor" : "/dashboard/customer",
       });
 
-      if (result?.error) {
-        throw new Error(result.error.message || "Google authentication failed.");
+      if (result?.data?.url) {
+        window.location.href = result.data.url;
+        return;
       }
-    } catch {
-      // Seamless fallback for development/demo environment
-      const demoEmail = `google.${name.toLowerCase().replace(/[^a-z0-9]/g, "") || "user"}.${Date.now().toString().slice(-4)}@gmail.com`;
-      try {
-        const response = await apiRequest<RegisterResponse>("/api/auth/jwt", {
-          method: "POST",
-          data: {
-            name: name.trim() || "Google Member",
-            email: email.trim() || demoEmail,
-            role,
-            businessName: role === "vendor" ? (businessName.trim() || "Artisan Italian Kitchen") : null,
-            image: image.trim() || "https://lh3.googleusercontent.com/a/default-user",
-          },
-        });
-
-        if (response.success && response.token && response.user) {
-          login(response.token, response.user);
-          toast.success(`Google authentication successful! Welcome, ${response.user.name}.`);
-
-          if (role === "vendor") {
-            router.push("/dashboard/vendor");
-          } else {
-            router.push("/dashboard/customer");
-          }
-        }
-      } catch (fallbackErr: unknown) {
-        const msg = fallbackErr instanceof Error ? fallbackErr.message : "Google signup failed. Please use email & password.";
-        toast.error(msg);
-      }
-    } finally {
-      setGoogleLoading(false);
+    } catch (err: unknown) {
+      console.warn("[Google Auth Redirect]:", err);
     }
+
+    // 2. Guaranteed direct redirection to Google OAuth consent screen
+    const clientId =
+      process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
+      "103456789012-samplegoogleclientid.apps.googleusercontent.com";
+    const origin = typeof window !== "undefined" ? window.location.origin : "https://pizzahub-client-beta.vercel.app";
+    const redirectUri = encodeURIComponent(`${origin}/api/auth/callback/google`);
+    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=openid%20email%20profile&prompt=select_account`;
+
+    window.location.href = googleAuthUrl;
   };
 
   return (

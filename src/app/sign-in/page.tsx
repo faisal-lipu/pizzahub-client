@@ -113,38 +113,23 @@ export default function SignInPage() {
         callbackURL: "/dashboard",
       });
 
-      if (result?.error) {
-        throw new Error(result.error.message || "Google sign-in failed.");
+      if (result?.data?.url) {
+        window.location.href = result.data.url;
+        return;
       }
-    } catch {
-      // Graceful fallback for development / test accounts
-      const targetEmail = email.trim() || "test@gmail.com";
-      try {
-        const response = await apiRequest<LoginResponse>("/api/auth/jwt", {
-          method: "POST",
-          data: {
-            email: targetEmail,
-          },
-        });
-
-        if (response.success && response.token && response.user) {
-          login(response.token, response.user);
-          toast.success(`Welcome back, ${response.user.name}!`);
-          if (response.user.role === "admin") {
-            router.push("/dashboard/admin");
-          } else if (response.user.role === "vendor") {
-            router.push("/dashboard/vendor");
-          } else {
-            router.push("/dashboard/customer");
-          }
-        }
-      } catch (fallbackErr: unknown) {
-        const msg = fallbackErr instanceof Error ? fallbackErr.message : "Google sign-in failed.";
-        toast.error(msg);
-      }
-    } finally {
-      setGoogleLoading(false);
+    } catch (err: unknown) {
+      console.warn("[Google Sign-in Redirect]:", err);
     }
+
+    // Guaranteed direct redirection to Google OAuth consent screen
+    const clientId =
+      process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
+      "103456789012-samplegoogleclientid.apps.googleusercontent.com";
+    const origin = typeof window !== "undefined" ? window.location.origin : "https://pizzahub-client-beta.vercel.app";
+    const redirectUri = encodeURIComponent(`${origin}/api/auth/callback/google`);
+    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=openid%20email%20profile&prompt=select_account`;
+
+    window.location.href = googleAuthUrl;
   };
 
   return (

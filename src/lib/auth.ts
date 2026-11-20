@@ -3,7 +3,7 @@ import { jwt } from "better-auth/plugins";
 
 /**
  * Better Auth Server Configuration
- * Configures authentication server with JWT plugin for interoperability with Express backend
+ * Configures authentication server with Google OAuth and JWT plugin
  */
 export const auth = betterAuth({
   secret:
@@ -14,6 +14,17 @@ export const auth = betterAuth({
     process.env.BETTER_AUTH_URL ||
     process.env.NEXT_PUBLIC_APP_URL ||
     "http://localhost:3000",
+  socialProviders: {
+    google: {
+      clientId:
+        process.env.GOOGLE_CLIENT_ID ||
+        process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
+        "103456789012-samplegoogleclientid.apps.googleusercontent.com",
+      clientSecret:
+        process.env.GOOGLE_CLIENT_SECRET ||
+        "GOCSPX-samplegoogleclientsecretkey",
+    },
+  },
   plugins: [
     jwt({
       jwt: {
