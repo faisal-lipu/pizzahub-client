@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import DonutChart from "@/components/dashboard/DonutChart";
 import BarChart from "@/components/dashboard/BarChart";
 import TrendChart from "@/components/dashboard/TrendChart";
+import OrderStatusTimeline from "@/components/dashboard/OrderStatusTimeline";
 import {
   Store,
   PlusCircle,
@@ -136,6 +137,7 @@ function VendorDashboardInner() {
 
   // View Item modal state
   const [viewingItem, setViewingItem] = useState<MenuItem | null>(null);
+  const [timelineOrder, setTimelineOrder] = useState<VendorOrder | null>(null);
 
   // Action / Confirmation states
   const [actionInProgress, setActionInProgress] = useState<string | null>(null);
@@ -1219,8 +1221,20 @@ function VendorDashboardInner() {
                       )}
                     </div>
 
-                    {/* Order Action Buttons: Accept or Reject (Only for Pending, Only Once) */}
+                    {/* Order Action Buttons: Accept or Reject + Timeline */}
                     <div className="flex items-center gap-2 shrink-0">
+                      {/* View Status Timeline */}
+                      <button
+                        type="button"
+                        onClick={() => setTimelineOrder(order)}
+                        className="inline-flex items-center gap-1 px-3 py-2 rounded-full border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-50 text-xs font-bold transition-colors cursor-pointer"
+                        title="View Order Status Timeline"
+                        aria-label="View Order Status Timeline"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        <span className="hidden sm:inline">Timeline</span>
+                      </button>
+
                       {isPending ? (
                         <>
                           <button
@@ -1646,6 +1660,68 @@ function VendorDashboardInner() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================
+          MODAL 2.5: VIEW ORDER STATUS TIMELINE (VENDOR)
+         ======================================================== */}
+      {timelineOrder && (
+        <div className="fixed inset-0 bg-stone-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 shadow-xl border border-stone-200 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-stone-100">
+              <h3 className="text-lg font-black text-stone-900">Order Status Timeline</h3>
+              <button
+                type="button"
+                onClick={() => setTimelineOrder(null)}
+                className="p-1 rounded-lg text-stone-400 hover:text-stone-700 cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="flex items-center gap-4 p-3 bg-stone-50 rounded-2xl border border-stone-200/70">
+              <div className="relative w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-stone-200">
+                <PizzaImage
+                  src={
+                    (Array.isArray(timelineOrder.menuItem?.images) && timelineOrder.menuItem?.images[0]) ||
+                    "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&auto=format&fit=crop&q=80"
+                  }
+                  alt={timelineOrder.menuItem?.itemName || timelineOrder.itemName || "Pizza"}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div>
+                <h4 className="text-sm font-black text-stone-900">
+                  {timelineOrder.menuItem?.itemName || timelineOrder.itemName || "Artisan Pizza Order"}
+                </h4>
+                <p className="text-xs text-[#D91E18] font-black">
+                  ${Number(timelineOrder.menuItem?.price || timelineOrder.itemPrice || 14.99).toFixed(2)}
+                </p>
+                <p className="text-[11px] text-stone-500">
+                  Customer: {timelineOrder.customer?.name || timelineOrder.customerName || "Customer"}
+                </p>
+              </div>
+            </div>
+
+            {/* Live Order Status Timeline Component */}
+            <OrderStatusTimeline
+              status={timelineOrder.status}
+              createdAt={timelineOrder.createdAt}
+              deliveryDate={timelineOrder.deliveryDate}
+            />
+
+            <div className="pt-2 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setTimelineOrder(null)}
+                className="px-5 py-2 rounded-full bg-stone-900 text-white font-bold text-xs cursor-pointer hover:bg-stone-800"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}

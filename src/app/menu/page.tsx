@@ -8,6 +8,7 @@ import { Search, Filter, ArrowUpDown, Star, Heart, Loader2, MapPin, Store, Arrow
 import { apiRequest } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
+import { getFavoriteIds, toggleFavoriteItem } from "@/lib/favorites";
 
 interface MenuItem {
   _id: string;
@@ -246,10 +247,32 @@ function MenuContent() {
     return () => clearTimeout(timer);
   }, [search, selectedCategory, selectedLocation, sortOrder]);
 
-  const toggleFavorite = (id: string, e: React.MouseEvent) => {
+  useEffect(() => {
+    setFavorites(getFavoriteIds());
+    const onSync = () => setFavorites(getFavoriteIds());
+    window.addEventListener("pizzahub_favorites_updated", onSync);
+    return () => window.removeEventListener("pizzahub_favorites_updated", onSync);
+  }, []);
+
+  const toggleFavorite = (pizza: MenuItem, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setFavorites((prev) => ({ ...prev, [id]: !prev[id] }));
+    const added = toggleFavoriteItem({
+      _id: pizza._id,
+      name: pizza.name,
+      price: pizza.price,
+      category: pizza.category,
+      image: pizza.image || "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&auto=format&fit=crop&q=80",
+      rating: pizza.rating,
+      vendorName: pizza.vendorName,
+      location: pizza.location,
+    });
+    setFavorites(getFavoriteIds());
+    if (added) {
+      toast.success(`Added ${pizza.name} to your Wishlist!`);
+    } else {
+      toast.info(`Removed ${pizza.name} from Wishlist`);
+    }
   };
 
   const handleViewDetails = (pizzaId: string) => {
@@ -400,7 +423,7 @@ function MenuContent() {
 
                   <button
                     type="button"
-                    onClick={(e) => toggleFavorite(pizza._id, e)}
+                    onClick={(e) => toggleFavorite(pizza, e)}
                     className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-stone-600 hover:text-[#D91E18] shadow-sm transition-colors cursor-pointer"
                     aria-label="Add to favorites"
                   >

@@ -7,6 +7,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { apiRequest } from "@/lib/api";
 import { toast } from "sonner";
+import ReviewsSection from "@/components/ReviewsSection";
 import {
   ArrowLeft,
   Star,
@@ -687,6 +688,14 @@ export default function ItemDetailsPage() {
           )}
         </div>
       </div>
+
+      {/* Community Reviews & Ratings for Menu Item and Restaurant */}
+      <ReviewsSection
+        itemId={item._id}
+        itemName={item.name}
+        vendorName={item.vendorName}
+        initialRating={item.rating}
+      />
 
       {/* =========================================================================
           ORDER FORM MODAL

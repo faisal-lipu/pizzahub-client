@@ -11,6 +11,8 @@ import { toast } from "sonner";
 import DonutChart from "@/components/dashboard/DonutChart";
 import BarChart from "@/components/dashboard/BarChart";
 import TrendChart from "@/components/dashboard/TrendChart";
+import OrderStatusTimeline from "@/components/dashboard/OrderStatusTimeline";
+import { FavoritePizzaItem, getFavoriteItems, removeFavoriteItem } from "@/lib/favorites";
 import {
   ShoppingBag,
   Clock,
@@ -26,6 +28,8 @@ import {
   AlertTriangle,
   MessageSquare,
   DollarSign,
+  Heart,
+  Trash2,
 } from "lucide-react";
 
 interface CustomerOrder {
@@ -74,21 +78,35 @@ function CustomerDashboardInner() {
   const { user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const tabParam = searchParams.get("tab") as "overview" | "orders" | null;
+  const tabParam = searchParams.get("tab") as "overview" | "orders" | "favorites" | null;
 
   const [orders, setOrders] = useState<CustomerOrder[]>([]);
+  const [favoriteItems, setFavoriteItems] = useState<FavoritePizzaItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"overview" | "orders">(
-    tabParam === "orders" ? "orders" : "overview"
+  const [activeTab, setActiveTab] = useState<"overview" | "orders" | "favorites">(
+    tabParam === "orders" || tabParam === "favorites" ? tabParam : "overview"
   );
 
   useEffect(() => {
-    if (tabParam === "orders" || tabParam === "overview") {
+    if (tabParam === "orders" || tabParam === "overview" || tabParam === "favorites") {
       setActiveTab(tabParam);
     }
   }, [tabParam]);
 
-  const handleTabChange = (tab: "overview" | "orders") => {
+  useEffect(() => {
+    setFavoriteItems(getFavoriteItems());
+    const onSync = () => setFavoriteItems(getFavoriteItems());
+    window.addEventListener("pizzahub_favorites_updated", onSync);
+    return () => window.removeEventListener("pizzahub_favorites_updated", onSync);
+  }, []);
+
+  const handleRemoveFavorite = (id: string, name: string) => {
+    removeFavoriteItem(id);
+    setFavoriteItems(getFavoriteItems());
+    toast.info(`Removed ${name} from your Wishlist`);
+  };
+
+  const handleTabChange = (tab: "overview" | "orders" | "favorites") => {
     setActiveTab(tab);
     router.replace(`/dashboard/customer?tab=${tab}`);
   };
@@ -359,6 +377,18 @@ function CustomerDashboardInner() {
         >
           My Orders ({totalOrders})
         </button>
+        <button
+          type="button"
+          onClick={() => handleTabChange("favorites")}
+          className={`px-5 py-2.5 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+            activeTab === "favorites"
+              ? "bg-stone-900 text-white shadow-sm"
+              : "bg-white text-stone-600 border border-stone-200 hover:bg-stone-50"
+          }`}
+        >
+          <Heart className={`w-3.5 h-3.5 ${activeTab === "favorites" ? "fill-[#D91E18] text-[#D91E18]" : "text-stone-400"}`} />
+          <span>My Wishlist ({favoriteItems.length})</span>
+        </button>
       </div>
 
       {/* ========================================================
@@ -628,17 +658,128 @@ function CustomerDashboardInner() {
       )}
 
       {/* ========================================================
+          3. MY WISHLIST / FAVORITES (Requirement 4)
+         ======================================================== */}
+      {activeTab === "favorites" && (
+        <div className="bg-white rounded-3xl border border-stone-200/90 shadow-xs p-6 sm:p-8 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 border border-red-100 text-[#D91E18] text-[11px] font-black uppercase tracking-wider mb-1">
+                <Heart className="w-3.5 h-3.5 fill-[#D91E18]" />
+                <span>Customer Wishlist & Saved Pizzas</span>
+              </div>
+              <h2 className="text-xl font-black text-stone-900">My Favorite Pizzas</h2>
+              <p className="text-xs text-stone-500 font-medium mt-0.5">
+                Quickly re-order your favorite artisan pizzas saved while browsing the menu.
+              </p>
+            </div>
+            <Link
+              href="/menu"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#D91E18] hover:bg-[#B91C1C] text-white font-bold text-xs shadow-md shadow-red-500/20 transition-all self-start sm:self-auto"
+            >
+              <span>Explore Full Menu</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+
+          {favoriteItems.length === 0 ? (
+            <div className="py-16 text-center space-y-3">
+              <div className="w-16 h-16 rounded-full bg-red-50 text-[#D91E18] flex items-center justify-center mx-auto">
+                <Heart className="w-8 h-8" />
+              </div>
+              <p className="text-base font-bold text-stone-800">Your Wishlist is currently empty</p>
+              <p className="text-xs text-stone-500 max-w-sm mx-auto">
+                Click the heart icon on any pizza in our menu or homepage to save it here for fast 1-click reordering!
+              </p>
+              <Link
+                href="/menu"
+                className="inline-block mt-2 px-6 py-2.5 rounded-full bg-[#D91E18] text-white font-bold text-xs shadow-md shadow-red-500/20 hover:bg-[#B91C1C]"
+              >
+                Discover Pizzas
+              </Link>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {favoriteItems.map((fav) => (
+                <div
+                  key={fav._id}
+                  className="bg-stone-50/70 rounded-2xl border border-stone-200/80 p-4 flex flex-col justify-between hover:shadow-md transition-shadow group"
+                >
+                  <div className="space-y-3">
+                    <div className="relative w-full h-44 rounded-xl overflow-hidden bg-stone-100">
+                      <PizzaImage
+                        src={fav.image}
+                        alt={fav.name}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      <span className="absolute top-2.5 left-2.5 bg-white/95 backdrop-blur-xs text-stone-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full shadow-xs">
+                        {fav.category}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveFavorite(fav._id, fav.name)}
+                        className="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-white/95 backdrop-blur-xs flex items-center justify-center text-stone-400 hover:text-red-600 transition-colors cursor-pointer shadow-xs"
+                        title="Remove from Wishlist"
+                        aria-label="Remove from Wishlist"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    <div>
+                      <div className="flex items-center justify-between gap-2">
+                        <h3 className="text-base font-black text-stone-900 truncate">
+                          {fav.name}
+                        </h3>
+                        <span className="text-sm font-black text-[#D91E18] shrink-0">
+                          ${Number(fav.price).toFixed(2)}
+                        </span>
+                      </div>
+                      {fav.vendorName && (
+                        <p className="text-xs text-stone-500 font-medium flex items-center gap-1 mt-0.5">
+                          <Store className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                          <span className="truncate">{fav.vendorName}</span>
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="pt-4 mt-3 border-t border-stone-200/60 flex items-center justify-between gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveFavorite(fav._id, fav.name)}
+                      className="text-xs font-bold text-stone-400 hover:text-red-600 cursor-pointer"
+                    >
+                      Remove
+                    </button>
+                    <Link
+                      href={`/menu/${fav._id}`}
+                      className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-[#D91E18] hover:bg-[#B91C1C] text-white text-xs font-bold transition-all shadow-xs"
+                    >
+                      <span>Order Now</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ========================================================
           MODAL 1: VIEW ORDER DETAILS MODAL
          ======================================================== */}
       {viewingOrder && (
         <div className="fixed inset-0 bg-stone-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-xl border border-stone-200 space-y-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 shadow-xl border border-stone-200 space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-stone-100">
               <h3 className="text-lg font-black text-stone-900">Order Details</h3>
               <button
                 type="button"
                 onClick={() => setViewingOrder(null)}
-                className="p-1 rounded-lg text-stone-400 hover:text-stone-700"
+                className="p-1 rounded-lg text-stone-400 hover:text-stone-700 cursor-pointer"
               >
                 ✕
               </button>
@@ -654,6 +795,13 @@ function CustomerDashboardInner() {
                 <p className="text-[11px] text-stone-500">{viewingOrder.itemCategory}</p>
               </div>
             </div>
+
+            {/* Live Order Status Timeline (Requirement 3) */}
+            <OrderStatusTimeline
+              status={viewingOrder.status}
+              createdAt={viewingOrder.createdAt}
+              deliveryDate={viewingOrder.deliveryDate}
+            />
 
             <div className="space-y-2 text-xs">
               <div className="flex items-center justify-between">
