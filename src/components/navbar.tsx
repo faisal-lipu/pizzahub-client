@@ -13,6 +13,7 @@ import {
   LogOut,
   Menu,
   X,
+  Crown,
 } from "lucide-react";
 import UserAvatar from "./UserAvatar";
 
@@ -211,15 +212,29 @@ export default function Navbar() {
 
               {/* Profile Dropdown Menu (when authenticated) */}
               {profileDropdownOpen && isAuthenticated && user && (
-                <div className="absolute right-0 top-full mt-3 w-60 rounded-2xl bg-white shadow-xl border border-gray-100 py-2 divide-y divide-gray-100 animate-in fade-in zoom-in-95 duration-100 z-50">
-                  <div className="px-4 py-2.5">
-                    <p className="text-xs text-gray-500 font-medium">Signed in as</p>
-                    <p className="text-sm font-bold text-[#111827] truncate">
-                      {user.name || user.email}
-                    </p>
-                    <span className="inline-block mt-1 text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 bg-red-50 text-[#D91E18] rounded-md border border-red-100">
-                      {user.role}
-                    </span>
+                <div className="absolute right-0 top-full mt-3 w-64 rounded-2xl bg-white shadow-xl border border-gray-100 py-2 divide-y divide-gray-100 animate-in fade-in zoom-in-95 duration-100 z-50">
+                  <div className="px-4 py-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs text-gray-500 font-medium">Signed in as</p>
+                        <p className="text-sm font-bold text-[#111827] truncate mt-0.5">
+                          {user.name || user.email}
+                        </p>
+                        <span className="inline-block mt-1.5 text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 bg-red-50 text-[#D91E18] rounded-md border border-red-100">
+                          {user.role}
+                        </span>
+                      </div>
+
+                      {/* Tablet-pill: Premium Account Indicator */}
+                      {user.subscriptionPlan === "premium" && (
+                        <div className="shrink-0 mt-1">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 text-white text-[11px] font-black shadow-xs shadow-amber-500/25 border border-amber-300/50 whitespace-nowrap">
+                            <Crown className="w-3.5 h-3.5 fill-amber-200 text-amber-200 shrink-0" />
+                            <span className="tracking-wide">Premium</span>
+                          </span>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   <div className="py-1">
@@ -310,12 +325,21 @@ export default function Navbar() {
 
               {isAuthenticated && user ? (
                 <div className="border-t border-gray-100 pt-3 space-y-2">
-                  <div className="px-4 py-1">
-                    <p className="text-xs text-gray-500">Signed in as</p>
-                    <p className="text-sm font-bold text-[#111827]">{userName}</p>
-                    <span className="text-[10px] uppercase font-bold text-[#D91E18]">
-                      Role: {user.role}
-                    </span>
+                  <div className="px-4 py-1 flex items-start justify-between gap-2">
+                    <div>
+                      <p className="text-xs text-gray-500">Signed in as</p>
+                      <p className="text-sm font-bold text-[#111827]">{userName}</p>
+                      <span className="text-[10px] uppercase font-bold text-[#D91E18]">
+                        Role: {user.role}
+                      </span>
+                    </div>
+
+                    {user.subscriptionPlan === "premium" && (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 text-white text-[11px] font-black shadow-xs border border-amber-300/40 whitespace-nowrap">
+                        <Crown className="w-3.5 h-3.5 fill-amber-200 text-amber-200 shrink-0" />
+                        <span>Premium</span>
+                      </span>
+                    )}
                   </div>
                   <Link
                     href={getDashboardHref()}
