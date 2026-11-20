@@ -97,7 +97,7 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full py-3 sm:py-4 px-3 sm:px-6 lg:px-8 max-w-full overflow-hidden">
+      <header className="sticky top-0 z-50 w-full py-3 sm:py-4 px-4 sm:px-6 lg:px-8 max-w-full overflow-hidden">
         {/* ========================================================
             DESKTOP NAVBAR (md and above): Floating Split-Pill Design
            ======================================================== */}
