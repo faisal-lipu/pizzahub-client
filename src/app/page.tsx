@@ -164,7 +164,7 @@ export default function HomePage() {
           - CTA button: "Explore Pizza Menu"
           - Pizza-themed background image or illustration
          ======================================================== */}
-      <section className="relative pt-6 pb-20 md:pt-12 md:pb-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden">
+      <section className="relative min-h-[calc(100vh-5rem)] flex items-center py-6 sm:py-8 lg:py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden">
         {/* Pizza-Themed Ambient Background Illustration & Glow */}
         <div className="absolute top-0 right-10 w-96 h-96 bg-gradient-to-br from-amber-400/20 via-red-500/10 to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
         <div className="absolute -bottom-10 -left-10 w-72 h-72 bg-gradient-to-tr from-red-500/10 via-amber-300/10 to-transparent rounded-full blur-2xl pointer-events-none -z-10" />
@@ -172,9 +172,9 @@ export default function HomePage() {
         {/* Background decorative pizza doodle SVG watermark */}
         <div className="absolute inset-0 pointer-events-none opacity-[0.035] -z-10 bg-[radial-gradient(#D91E18_1px,transparent_1px)] [background-size:24px_24px]" />
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 items-center">
           {/* Left Text Column */}
-          <div className="lg:col-span-7 space-y-6">
+          <div className="lg:col-span-7 space-y-4 sm:space-y-5 lg:space-y-6">
             {/* PizzaHub Fresh Kicker */}
             <div className="inline-flex items-center gap-2 bg-amber-50 border border-amber-200/80 px-3.5 py-1.5 rounded-full shadow-xs">
               <span className="font-serif italic text-base md:text-lg font-bold text-amber-700 tracking-wide">
@@ -219,7 +219,7 @@ export default function HomePage() {
             </div>
 
             {/* Quick Metrics Bar */}
-            <div className="pt-6 grid grid-cols-3 gap-4 border-t border-stone-200/60 max-w-md">
+            <div className="pt-4 sm:pt-5 grid grid-cols-3 gap-4 border-t border-stone-200/60 max-w-md">
               <div>
                 <p className="text-2xl font-black text-stone-900">15m</p>
                 <p className="text-xs font-semibold text-stone-500 uppercase">Fast Delivery</p>
