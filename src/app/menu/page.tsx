@@ -382,7 +382,7 @@ function MenuContent() {
             return (
               <div
                 key={pizza._id}
-                className="group bg-white rounded-3xl border border-stone-200/80 overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
+                className="group bg-white rounded-3xl border border-stone-200/80 overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between h-full"
               >
                 {/* Image */}
                 <div className="relative w-full h-52 overflow-hidden bg-stone-100">
