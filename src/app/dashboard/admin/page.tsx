@@ -8,6 +8,7 @@ import { apiRequest } from "@/lib/api";
 import { toast } from "sonner";
 import ConfirmModal from "@/components/ConfirmModal";
 import PizzaImage from "@/components/PizzaImage";
+import UserAvatar from "@/components/UserAvatar";
 import {
   ShieldAlert,
   Users,
@@ -40,6 +41,7 @@ interface AdminUser {
   role: "customer" | "vendor" | "admin";
   isBlocked?: boolean;
   businessName?: string;
+  image?: string | null;
   createdAt?: string;
 }
 
@@ -657,9 +659,12 @@ function AdminDashboardContent() {
                         {/* User Details */}
                         <td className="py-3.5 px-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-stone-100 text-stone-700 font-black text-xs flex items-center justify-center shrink-0 border border-stone-200">
-                              {u.name ? u.name.charAt(0).toUpperCase() : "U"}
-                            </div>
+                            <UserAvatar
+                              src={u.image}
+                              name={u.name}
+                              size="sm"
+                              className="border-stone-200"
+                            />
                             <div>
                               <p className="font-bold text-stone-900 flex items-center gap-1.5">
                                 {u.name}

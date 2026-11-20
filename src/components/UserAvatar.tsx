@@ -59,6 +59,7 @@ export default function UserAvatar({
           priority={priority}
           sizes={`${px}px`}
           className="object-cover"
+          referrerPolicy="no-referrer"
           onError={() => setHasError(true)}
         />
       ) : initial ? (

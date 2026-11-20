@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { useAuth } from "@/context/AuthContext";
+import UserAvatar from "@/components/UserAvatar";
 import {
   Pizza,
   Store,
@@ -199,9 +200,12 @@ export default function DashboardLayout({
             {/* Logged-in User Profile Card */}
             <div className="mt-5 p-3.5 rounded-2xl bg-stone-50 border border-stone-200/70">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-[#D91E18] text-white flex items-center justify-center font-black text-sm shrink-0 shadow-sm">
-                  {user?.name ? user.name[0].toUpperCase() : "U"}
-                </div>
+                <UserAvatar
+                  src={user?.image}
+                  name={user?.name}
+                  size="md"
+                  className="border-stone-200 shadow-xs"
+                />
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-bold text-stone-900 truncate">
                     {user?.name || "Kitchen User"}
