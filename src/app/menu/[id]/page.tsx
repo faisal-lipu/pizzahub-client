@@ -440,10 +440,10 @@ export default function ItemDetailsPage() {
       {/* Main Details & Ordering Layout */}
       <div className="bg-white rounded-3xl border border-stone-200/90 shadow-xs overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-0">
         {/* Left Column: Multiple Images Gallery & Highlights */}
-        <div className="lg:col-span-6 p-6 sm:p-8 flex flex-col justify-between bg-[#D91E18] text-white border-b lg:border-b-0 lg:border-r border-red-700/40">
+        <div className="lg:col-span-6 p-6 sm:p-8 flex flex-col justify-between bg-gradient-to-br from-[#152331] to-[#000000] text-white border-b lg:border-b-0 lg:border-r border-stone-800 shadow-2xl">
           <div>
             {/* Primary Large Image */}
-            <div className="relative w-full aspect-square max-h-[420px] rounded-2xl overflow-hidden shadow-xl mx-auto bg-black/20 border border-white/20">
+            <div className="relative w-full aspect-square max-h-[420px] rounded-2xl overflow-hidden shadow-xl mx-auto bg-black/40 border border-white/10">
               <PizzaImage
                 src={selectedImage || item.images[0]}
                 alt={item.name}
@@ -452,7 +452,7 @@ export default function ItemDetailsPage() {
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover transition-all duration-300"
               />
-              <span className="absolute top-4 left-4 bg-[#D91E18] text-white text-xs font-black px-3.5 py-1.5 rounded-full shadow-md border border-white/40">
+              <span className="absolute top-4 left-4 bg-gradient-to-r from-[#152331] to-[#000000] text-amber-300 text-xs font-black px-3.5 py-1.5 rounded-full shadow-lg border border-amber-400/30 backdrop-blur-md">
                 {item.category}
               </span>
             </div>
@@ -460,7 +460,7 @@ export default function ItemDetailsPage() {
             {/* Multiple Images Thumbnails (Interactive Gallery) */}
             {item.images && item.images.length > 1 && (
               <div className="mt-4">
-                <p className="text-[11px] font-bold uppercase tracking-wider text-white/90 mb-2">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-stone-300 mb-2">
                   Explore Multiple Angles ({item.images.length} Photos)
                 </p>
                 <div className="flex items-center gap-3 overflow-x-auto pb-1">
@@ -473,8 +473,8 @@ export default function ItemDetailsPage() {
                         onClick={() => setSelectedImage(imgUrl)}
                         className={`relative w-20 h-20 rounded-xl overflow-hidden shrink-0 transition-all cursor-pointer border ${
                           isSelected
-                            ? "ring-2 ring-white ring-offset-2 ring-offset-[#D91E18] border-transparent scale-105"
-                            : "border-white/30 hover:border-white opacity-85 hover:opacity-100"
+                            ? "ring-2 ring-amber-400 ring-offset-2 ring-offset-[#000000] border-transparent scale-105"
+                            : "border-white/20 hover:border-white/60 opacity-80 hover:opacity-100"
                         }`}
                         aria-label={`View photo angle ${idx + 1}`}
                       >
@@ -495,19 +495,19 @@ export default function ItemDetailsPage() {
 
           {/* Quick Specifications Strip */}
           <div className="mt-6 grid grid-cols-3 gap-3">
-            <div className="bg-white/15 backdrop-blur-md p-3 rounded-2xl border border-white/20 text-center shadow-xs">
-              <Clock className="w-4 h-4 text-amber-300 mx-auto mb-1" />
-              <p className="text-[10px] text-white/80 font-bold uppercase tracking-wider">Prep Time</p>
+            <div className="bg-white/5 backdrop-blur-md p-3 rounded-2xl border border-white/10 text-center shadow-xs">
+              <Clock className="w-4 h-4 text-amber-400 mx-auto mb-1" />
+              <p className="text-[10px] text-stone-300 font-bold uppercase tracking-wider">Prep Time</p>
               <p className="text-sm font-black text-white">{item.preparationTime} mins</p>
             </div>
-            <div className="bg-white/15 backdrop-blur-md p-3 rounded-2xl border border-white/20 text-center shadow-xs">
-              <Star className="w-4 h-4 text-amber-300 fill-amber-300 mx-auto mb-1" />
-              <p className="text-[10px] text-white/80 font-bold uppercase tracking-wider">Rating</p>
+            <div className="bg-white/5 backdrop-blur-md p-3 rounded-2xl border border-white/10 text-center shadow-xs">
+              <Star className="w-4 h-4 text-amber-400 fill-amber-400 mx-auto mb-1" />
+              <p className="text-[10px] text-stone-300 font-bold uppercase tracking-wider">Rating</p>
               <p className="text-sm font-black text-white">{item.rating.toFixed(1)} / 5.0</p>
             </div>
-            <div className="bg-white/15 backdrop-blur-md p-3 rounded-2xl border border-white/20 text-center shadow-xs">
-              <ShieldCheck className="w-4 h-4 text-emerald-300 mx-auto mb-1" />
-              <p className="text-[10px] text-white/80 font-bold uppercase tracking-wider">Kitchen</p>
+            <div className="bg-white/5 backdrop-blur-md p-3 rounded-2xl border border-white/10 text-center shadow-xs">
+              <ShieldCheck className="w-4 h-4 text-emerald-400 mx-auto mb-1" />
+              <p className="text-[10px] text-stone-300 font-bold uppercase tracking-wider">Kitchen</p>
               <p className="text-sm font-black text-white truncate">100% Vetted</p>
             </div>
           </div>
@@ -561,35 +561,35 @@ export default function ItemDetailsPage() {
             </div>
 
             {/* Vendor Information & Location Card */}
-            <div className="bg-[#D91E18] rounded-2xl p-4 border border-red-600/50 mb-6 space-y-3 text-white shadow-md">
+            <div className="bg-gradient-to-br from-[#152331] to-[#000000] rounded-2xl p-4.5 border border-white/10 mb-6 space-y-3 text-white shadow-xl">
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-xl bg-white/20 text-white flex items-center justify-center shrink-0">
+                  <div className="w-9 h-9 rounded-xl bg-white/10 text-amber-400 flex items-center justify-center shrink-0 border border-white/10">
                     <Store className="w-4 h-4" />
                   </div>
                   <div>
                     <div className="flex items-center gap-1.5">
                       <span className="text-xs font-bold text-white">{item.vendorName}</span>
                       {item.isPremiumVendor && (
-                        <span className="bg-amber-400 text-stone-900 text-[9px] font-black px-1.5 py-0.5 rounded-md">
+                        <span className="bg-amber-400 text-stone-950 text-[9px] font-black px-1.5 py-0.5 rounded-md">
                           PRO
                         </span>
                       )}
                     </div>
-                    <p className="text-[11px] text-white/80">{item.vendorEmail}</p>
+                    <p className="text-[11px] text-stone-300">{item.vendorEmail}</p>
                   </div>
                 </div>
 
-                <span className="text-[10px] font-bold text-white bg-white/20 px-2.5 py-1 rounded-full border border-white/30">
+                <span className="text-[10px] font-bold text-emerald-300 bg-emerald-500/20 px-2.5 py-1 rounded-full border border-emerald-500/30">
                   Verified Kitchen
                 </span>
               </div>
 
               {/* Location Info */}
-              <div className="flex items-center gap-2 text-xs text-white/90 pt-2 border-t border-white/20">
-                <MapPin className="w-3.5 h-3.5 text-white shrink-0" />
+              <div className="flex items-center gap-2 text-xs text-stone-200 pt-2 border-t border-white/10">
+                <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                 <span className="font-semibold text-white">{item.location}</span>
-                <span className="text-white/80 text-[11px]">• Hand-delivered hot</span>
+                <span className="text-stone-400 text-[11px]">• Hand-delivered hot</span>
               </div>
             </div>
 
@@ -597,61 +597,61 @@ export default function ItemDetailsPage() {
             <div className="space-y-4 pt-2">
               {/* Case 1: Unauthenticated Guest User */}
               {!user ? (
-                <div className="bg-[#D91E18] border border-red-600/50 rounded-2xl p-5 text-center space-y-3 text-white shadow-md">
-                  <div className="w-10 h-10 rounded-full bg-white/20 text-white flex items-center justify-center mx-auto">
+                <div className="bg-gradient-to-br from-[#152331] to-[#000000] border border-white/10 rounded-2xl p-5 text-center space-y-3 text-white shadow-xl">
+                  <div className="w-10 h-10 rounded-full bg-white/10 text-amber-400 border border-white/10 flex items-center justify-center mx-auto">
                     <Lock className="w-5 h-5" />
                   </div>
                   <div>
                     <h4 className="text-sm font-bold text-white">Sign In Required to Order</h4>
-                    <p className="text-xs text-white/90 mt-1 max-w-sm mx-auto">
+                    <p className="text-xs text-stone-300 mt-1 max-w-sm mx-auto">
                       Customers must be logged in to place pizza orders and track delivery status.
                     </p>
                   </div>
                   <Link
                     href={`/sign-in?redirect=${encodeURIComponent(`/menu/${id}`)}`}
-                    className="inline-flex items-center justify-center gap-2 px-8 py-3 rounded-full bg-white hover:bg-stone-100 text-[#D91E18] text-xs font-black shadow-md transition-all cursor-pointer"
+                    className="inline-flex items-center justify-center gap-2 px-8 py-3 rounded-full bg-white hover:bg-stone-100 text-stone-950 text-xs font-black shadow-md transition-all cursor-pointer"
                   >
                     <span>Sign In to Order</span>
                   </Link>
                 </div>
               ) : isAdmin ? (
                 /* Case 2: Admin Account */
-                <div className="bg-[#D91E18] border border-red-600/50 rounded-2xl p-5 text-center space-y-2 text-white shadow-md">
-                  <Info className="w-6 h-6 text-white mx-auto" />
-                  <h4 className="text-xs font-bold text-white uppercase tracking-wide">
+                <div className="bg-gradient-to-br from-[#152331] to-[#000000] border border-white/10 rounded-2xl p-5 text-center space-y-2 text-white shadow-xl">
+                  <Info className="w-6 h-6 text-amber-400 mx-auto" />
+                  <h4 className="text-xs font-bold text-amber-400 uppercase tracking-wide">
                     Admin Access Restriction
                   </h4>
-                  <p className="text-xs text-white/90 max-w-sm mx-auto">
+                  <p className="text-xs text-stone-300 max-w-sm mx-auto">
                     Administrators cannot place customer food orders. Please sign in with a customer account.
                   </p>
                 </div>
               ) : isOwnVendorItem ? (
                 /* Case 3: Vendor Own Item */
-                <div className="bg-[#D91E18] border border-red-600/50 rounded-2xl p-5 text-center space-y-2 text-white shadow-md">
-                  <Info className="w-6 h-6 text-white mx-auto" />
-                  <h4 className="text-xs font-bold text-white uppercase tracking-wide">
+                <div className="bg-gradient-to-br from-[#152331] to-[#000000] border border-white/10 rounded-2xl p-5 text-center space-y-2 text-white shadow-xl">
+                  <Info className="w-6 h-6 text-amber-400 mx-auto" />
+                  <h4 className="text-xs font-bold text-amber-400 uppercase tracking-wide">
                     Vendor Kitchen Restriction
                   </h4>
-                  <p className="text-xs text-white/90 max-w-sm mx-auto">
+                  <p className="text-xs text-stone-300 max-w-sm mx-auto">
                     You are the vendor for this pizza. Vendors cannot place orders for their own menu items.
                   </p>
                 </div>
               ) : !isItemApproved ? (
                 /* Case 4: Item Not Approved */
-                <div className="bg-[#D91E18] border border-red-600/50 rounded-2xl p-5 text-center space-y-2 text-white shadow-md">
-                  <AlertTriangle className="w-6 h-6 text-white mx-auto" />
-                  <h4 className="text-xs font-bold text-white uppercase tracking-wide">
+                <div className="bg-gradient-to-br from-[#152331] to-[#000000] border border-white/10 rounded-2xl p-5 text-center space-y-2 text-white shadow-xl">
+                  <AlertTriangle className="w-6 h-6 text-amber-400 mx-auto" />
+                  <h4 className="text-xs font-bold text-amber-400 uppercase tracking-wide">
                     Item Unavailable
                   </h4>
-                  <p className="text-xs text-white/90 max-w-sm mx-auto">
+                  <p className="text-xs text-stone-300 max-w-sm mx-auto">
                     This item is currently pending approval or inactive and cannot be ordered at this time.
                   </p>
                 </div>
               ) : (
                 /* Case 5: Eligible Customer - "When a customer clicks Order on the details page, show an order form." */
                 <div className="space-y-4">
-                  <div className="p-4 rounded-2xl bg-[#D91E18] border border-red-600/50 text-white shadow-md">
-                    <p className="text-xs text-white font-medium leading-relaxed">
+                  <div className="p-4 rounded-2xl bg-gradient-to-br from-[#152331] to-[#000000] border border-white/10 text-white shadow-xl">
+                    <p className="text-xs text-stone-200 font-medium leading-relaxed">
                       Freshly baked to perfection. Click below to specify your delivery date, address, and special instructions.
                     </p>
                   </div>
