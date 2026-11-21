@@ -370,13 +370,13 @@ export default function HomePage() {
         {/* Background decorative pizza doodle SVG watermark */}
         <div className="absolute inset-0 pointer-events-none opacity-[0.03] -z-10 bg-[radial-gradient(#D91E18_1px,transparent_1px)] [background-size:20px_20px]" />
 
-        <div className="w-full flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-12 xl:gap-16">
+        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 xl:gap-12 items-center">
           {/* Left Text Column with Motion */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
-            className="flex-1 max-w-2xl space-y-5 sm:space-y-6 w-full text-left"
+            className="lg:col-span-7 space-y-5 sm:space-y-6 w-full text-left"
           >
             {/* PizzaHub Fresh Kicker */}
             <div className="inline-flex items-center gap-2 bg-amber-50 dark:bg-amber-950/50 border border-amber-200/90 dark:border-amber-800/80 px-4 py-1.5 rounded-full shadow-2xs">
@@ -443,13 +443,13 @@ export default function HomePage() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.15, ease: "easeOut" }}
-            className="w-full lg:w-auto relative flex items-center justify-center lg:justify-end shrink-0"
+            className="lg:col-span-5 relative w-full flex items-center justify-center lg:justify-end"
           >
             {/* Background Warm Sunburst Shape */}
-            <div className="absolute w-72 sm:w-96 h-72 sm:h-96 rounded-full bg-gradient-to-tr from-amber-400/30 via-amber-200/30 to-red-100/20 blur-2xl -z-10" />
+            <div className="absolute w-72 sm:w-80 lg:w-96 h-72 sm:h-80 lg:h-96 rounded-full bg-gradient-to-tr from-amber-400/30 via-amber-200/30 to-red-100/20 blur-2xl -z-10" />
 
             {/* Floating Top Badge: 100% Real Cheese */}
-            <div className="absolute -top-3.5 -left-2 sm:-left-5 z-10 bg-white/95 dark:bg-stone-900/95 backdrop-blur-md rounded-2xl px-4 py-2 sm:px-4.5 sm:py-2.5 shadow-xl border border-stone-200/90 dark:border-stone-800 flex items-center gap-2.5">
+            <div className="absolute -top-3.5 -left-2 sm:-left-4 z-10 bg-white/95 dark:bg-stone-900/95 backdrop-blur-md rounded-2xl px-4 py-2 sm:px-4.5 sm:py-2.5 shadow-xl border border-stone-200/90 dark:border-stone-800 flex items-center gap-2.5">
               <span className="text-xl sm:text-2xl">🧀</span>
               <div>
                 <p className="text-xs sm:text-sm font-black text-stone-900 dark:text-stone-100 leading-tight">100% Mozzarella</p>
@@ -458,13 +458,13 @@ export default function HomePage() {
             </div>
 
             {/* Hero Pizza Composition (Large Frame aligned flush to the right) */}
-            <div className="relative w-full max-w-[420px] sm:max-w-[480px] lg:max-w-[500px] xl:max-w-[520px] aspect-square rounded-3xl overflow-hidden shadow-2xl border-4 border-white dark:border-stone-800 transform hover:scale-[1.01] transition-transform duration-300">
+            <div className="relative w-full max-w-[420px] sm:max-w-[460px] lg:max-w-[480px] xl:max-w-[500px] aspect-square rounded-3xl overflow-hidden shadow-2xl border-4 border-white dark:border-stone-800 transform hover:scale-[1.01] transition-transform duration-300">
               <Image
-                src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=1200&auto=format&fit=crop&q=85"
+                src="/banner.jpg"
                 alt="Hot & Fresh Artisan Pizza with melted cheese and fresh toppings"
                 fill
                 priority
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 520px"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 45vw, 500px"
                 className="object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
