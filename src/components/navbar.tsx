@@ -153,8 +153,6 @@ export default function Navbar() {
       );
     } else if (role === "vendor") {
       links.push(
-        { label: "My Pizzas", href: "/dashboard/vendor?tab=menu" },
-        { label: "Add Pizza", href: "/dashboard/vendor?tab=add" },
         { label: "Orders", href: "/dashboard/vendor?tab=orders" },
         { label: "Dashboard", href: "/dashboard/vendor" }
       );
