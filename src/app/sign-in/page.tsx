@@ -311,6 +311,71 @@ export default function SignInPage() {
           </button>
         </form>
 
+        {/* Quick Demo Credentials for Reviewers / Mentors */}
+        <div className="mt-6 pt-5 border-t border-gray-100">
+          <div className="flex items-center justify-between mb-2.5">
+            <span className="text-[11px] font-black tracking-wider text-stone-500 uppercase flex items-center gap-1.5">
+              <span>⚡</span> Demo Accounts
+            </span>
+            <span className="text-[10px] font-semibold text-stone-400 bg-stone-100 px-2 py-0.5 rounded-full">
+              1-Click Autofill
+            </span>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setEmail("admin@pizzahub.com");
+                setPassword("Admin@123");
+                setErrorMessage("");
+                toast.info("Admin credentials filled");
+              }}
+              className="p-2.5 rounded-2xl border border-red-200 bg-red-50/60 hover:bg-red-100/70 text-left transition-all cursor-pointer group"
+            >
+              <div className="text-[11px] font-black text-red-700 flex items-center justify-between">
+                <span>Admin</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
+              </div>
+              <div className="text-[10px] text-stone-500 truncate font-mono mt-0.5">admin@...</div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setEmail("vendor@pizzahub.com");
+                setPassword("Vendor@123");
+                setErrorMessage("");
+                toast.info("Vendor credentials filled");
+              }}
+              className="p-2.5 rounded-2xl border border-amber-200 bg-amber-50/60 hover:bg-amber-100/70 text-left transition-all cursor-pointer group"
+            >
+              <div className="text-[11px] font-black text-amber-700 flex items-center justify-between">
+                <span>Vendor</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+              </div>
+              <div className="text-[10px] text-stone-500 truncate font-mono mt-0.5">vendor@...</div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setEmail("test@pizzahub.com");
+                setPassword("Customer@123");
+                setErrorMessage("");
+                toast.info("Customer credentials filled");
+              }}
+              className="p-2.5 rounded-2xl border border-blue-200 bg-blue-50/60 hover:bg-blue-100/70 text-left transition-all cursor-pointer group"
+            >
+              <div className="text-[11px] font-black text-blue-700 flex items-center justify-between">
+                <span>Customer</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+              </div>
+              <div className="text-[10px] text-stone-500 truncate font-mono mt-0.5">test@...</div>
+            </button>
+          </div>
+        </div>
+
         <p className="mt-8 text-center text-sm text-gray-600">
           Don&apos;t have an account yet?{" "}
           <Link href="/sign-up" className="font-semibold text-[#D91E18] hover:underline">

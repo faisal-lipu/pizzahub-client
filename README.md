@@ -13,6 +13,18 @@ A modern, full-stack, role-based food ordering platform built with **Next.js 16 
 
 ---
 
+## 🔑 Demo Review Credentials & Stripe Test Card
+
+| Role | Email | Password | Target Dashboard |
+|---|---|---|---|
+| **Admin** | `admin@pizzahub.com` | `Admin@123` | `/dashboard/admin` |
+| **Vendor** | `vendor@pizzahub.com` | `Vendor@123` | `/dashboard/vendor` |
+| **Customer** | `test@pizzahub.com` | `Customer@123` | `/dashboard/customer` |
+
+- **Stripe Test Card Number:** `4242 4242 4242 4242` | **Expiry:** Any future date (e.g. `12/30`) | **CVC:** `123` | **Zip:** Any 5 digits (e.g. `10001`)
+
+---
+
 ## 🏆 Challenge Requirements Implementation Details
 
 ### 1. Challenge 1: Advanced Search and Price Sorting

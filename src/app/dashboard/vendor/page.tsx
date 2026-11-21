@@ -3,6 +3,7 @@
 import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import PizzaImage from "@/components/PizzaImage";
 import ConfirmModal from "@/components/ConfirmModal";
 import { useAuth } from "@/context/AuthContext";
@@ -1774,14 +1775,16 @@ function VendorDashboardInner() {
 
 export default function VendorDashboardPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="min-h-[70vh] flex items-center justify-center">
-          <Loader2 className="w-8 h-8 animate-spin text-[#D91E18]" />
-        </div>
-      }
-    >
-      <VendorDashboardInner />
-    </Suspense>
+    <ProtectedRoute allowedRoles={["vendor"]}>
+      <Suspense
+        fallback={
+          <div className="min-h-[70vh] flex items-center justify-center">
+            <Loader2 className="w-8 h-8 animate-spin text-[#D91E18]" />
+          </div>
+        }
+      >
+        <VendorDashboardInner />
+      </Suspense>
+    </ProtectedRoute>
   );
 }
