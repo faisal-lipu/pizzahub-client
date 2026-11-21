@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import {
   Search,
@@ -37,8 +37,9 @@ import { toast } from "sonner";
  * 4. Profile Dropdown with Avatar + Name trigger, full details, Dashboard, Settings, Logout
  * 5. Immediate Auth State Synchronization without full-page reloads
  */
-export default function Navbar() {
+function NavbarContent() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const router = useRouter();
   const { user, isAuthenticated, logout, loading } = useAuth();
 
@@ -172,6 +173,48 @@ export default function Navbar() {
   const navLinks = getNavLinks();
   const userName = user?.name || "Account";
 
+  // Accurately determine if a navigation link is active (handling query params like ?tab=transactions)
+  const isLinkActive = (href: string) => {
+    const [itemPath, itemQuery] = href.split("?");
+
+    if (href === "/") {
+      return pathname === "/";
+    }
+
+    // Link with query params (e.g. /dashboard/admin?tab=transactions, /dashboard/admin?tab=users)
+    if (itemQuery) {
+      if (pathname !== itemPath) return false;
+      const itemParams = new URLSearchParams(itemQuery);
+      for (const [key, value] of itemParams.entries()) {
+        if (searchParams.get(key) !== value) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    // Link without query params (e.g. /dashboard/admin, /dashboard/vendor, /dashboard/customer)
+    if (pathname === itemPath) {
+      if (itemPath.startsWith("/dashboard")) {
+        const tab = searchParams.get("tab");
+        // If an explicit tab like "transactions", "users", or "orders" is present in the URL,
+        // do NOT highlight the default "Dashboard" link
+        if (tab && tab !== "overview") {
+          return false;
+        }
+        return true;
+      }
+      return true;
+    }
+
+    // Subpath matching for non-dashboard pages (e.g. /menu/some-pizza -> /menu)
+    if (!itemPath.startsWith("/dashboard") && pathname?.startsWith(itemPath)) {
+      return true;
+    }
+
+    return false;
+  };
+
   return (
     <>
       <header
@@ -211,11 +254,7 @@ export default function Navbar() {
             {/* Desktop Navigation Links */}
             <div className="flex items-center gap-6 lg:gap-7">
               {navLinks.map((item) => {
-                const isActive =
-                  item.href === "/"
-                    ? pathname === "/"
-                    : pathname === item.href ||
-                      (item.href !== "/" && pathname?.startsWith(item.href) && !item.href.includes("?"));
+                const isActive = isLinkActive(item.href);
 
                 return (
                   <Link
@@ -511,11 +550,7 @@ export default function Navbar() {
               {/* Navigation Links */}
               <div className="space-y-1">
                 {navLinks.map((item) => {
-                  const isActive =
-                    item.href === "/"
-                      ? pathname === "/"
-                      : pathname === item.href ||
-                        (item.href !== "/" && pathname?.startsWith(item.href) && !item.href.includes("?"));
+                  const isActive = isLinkActive(item.href);
 
                   return (
                     <Link
@@ -639,3 +674,22 @@ export default function Navbar() {
     </>
   );
 }
+
+export default function Navbar() {
+  return (
+    <Suspense
+      fallback={
+        <header className="sticky top-0 z-50 w-full py-3 sm:py-4 bg-transparent px-4 sm:px-6 lg:px-8 max-w-full">
+          <nav className="hidden md:flex items-center justify-between gap-12 lg:gap-16 max-w-7xl mx-auto w-full">
+            <div className="bg-white dark:bg-stone-900 rounded-3xl shadow-sm border border-stone-200/80 dark:border-stone-800 px-6 sm:px-8 py-2 flex items-center justify-between flex-1 transition-all h-[58px]" />
+            <div className="bg-white dark:bg-stone-900 rounded-3xl shadow-sm border border-stone-200/80 dark:border-stone-800 px-4 py-2 flex items-center gap-3 transition-all shrink-0 h-[58px] w-48" />
+          </nav>
+          <div className="md:hidden bg-white dark:bg-stone-900 rounded-2xl shadow-sm border border-stone-200/90 dark:border-stone-800 px-3.5 py-2 flex items-center justify-between w-full h-[50px]" />
+        </header>
+      }
+    >
+      <NavbarContent />
+    </Suspense>
+  );
+}
+
