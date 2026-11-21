@@ -148,23 +148,18 @@ export default function Navbar() {
     if (role === "customer") {
       links.push(
         { label: "My Orders", href: "/dashboard/customer?tab=orders" },
-        { label: "Wishlist", href: "/wishlist" },
-        { label: "Dashboard", href: "/dashboard/customer" }
+        { label: "Wishlist", href: "/wishlist" }
       );
     } else if (role === "vendor") {
       links.push(
-        { label: "Orders", href: "/dashboard/vendor?tab=orders" },
-        { label: "Dashboard", href: "/dashboard/vendor" }
+        { label: "Orders", href: "/dashboard/vendor?tab=orders" }
       );
     } else if (role === "admin") {
       links.push(
         { label: "Manage Users", href: "/dashboard/admin?tab=users" },
         { label: "All Pizzas", href: "/dashboard/admin?tab=pizzas" },
-        { label: "Transactions", href: "/dashboard/admin?tab=transactions" },
-        { label: "Dashboard", href: "/dashboard/admin" }
+        { label: "Transactions", href: "/dashboard/admin?tab=transactions" }
       );
-    } else {
-      links.push({ label: "Dashboard", href: getDashboardHref() });
     }
 
     return links;
@@ -210,7 +205,7 @@ export default function Navbar() {
             </Link>
 
             {/* Desktop Navigation Links */}
-            <div className="flex items-center gap-6 lg:gap-7">
+            <div className="flex items-center gap-6 lg:gap-7 pr-20 lg:pr-28">
               {navLinks.map((item) => {
                 const isActive =
                   item.href === "/"
