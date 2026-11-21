@@ -148,18 +148,23 @@ export default function Navbar() {
     if (role === "customer") {
       links.push(
         { label: "My Orders", href: "/dashboard/customer?tab=orders" },
-        { label: "Wishlist", href: "/wishlist" }
+        { label: "Wishlist", href: "/wishlist" },
+        { label: "Dashboard", href: "/dashboard/customer" }
       );
     } else if (role === "vendor") {
       links.push(
-        { label: "Orders", href: "/dashboard/vendor?tab=orders" }
+        { label: "Orders", href: "/dashboard/vendor?tab=orders" },
+        { label: "Dashboard", href: "/dashboard/vendor" }
       );
     } else if (role === "admin") {
       links.push(
         { label: "Manage Users", href: "/dashboard/admin?tab=users" },
         { label: "All Pizzas", href: "/dashboard/admin?tab=pizzas" },
-        { label: "Transactions", href: "/dashboard/admin?tab=transactions" }
+        { label: "Transactions", href: "/dashboard/admin?tab=transactions" },
+        { label: "Dashboard", href: "/dashboard/admin" }
       );
+    } else {
+      links.push({ label: "Dashboard", href: getDashboardHref() });
     }
 
     return links;
@@ -180,7 +185,7 @@ export default function Navbar() {
         {/* ========================================================
             DESKTOP NAVBAR (md and above): Floating Split-Pill Design
            ======================================================== */}
-        <nav className="hidden md:flex items-center justify-between gap-4 max-w-7xl mx-auto w-full">
+        <nav className="hidden md:flex items-center justify-between gap-12 lg:gap-16 max-w-7xl mx-auto w-full">
           {/* LEFT PILL: Main Navigation */}
           <div className="bg-white dark:bg-stone-900 rounded-3xl shadow-sm border border-stone-200/80 dark:border-stone-800 px-6 sm:px-8 py-2 flex items-center justify-between flex-1 transition-all">
             {/* 1. Brand Logo / Name linking to / */}
@@ -205,7 +210,7 @@ export default function Navbar() {
             </Link>
 
             {/* Desktop Navigation Links */}
-            <div className="flex items-center gap-6 lg:gap-7 pr-20 lg:pr-28">
+            <div className="flex items-center gap-6 lg:gap-7">
               {navLinks.map((item) => {
                 const isActive =
                   item.href === "/"
