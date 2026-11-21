@@ -16,7 +16,6 @@ import {
   User,
   ShieldAlert,
   LogOut,
-  Home,
   Menu as MenuIcon,
   X,
   Crown,
@@ -216,18 +215,18 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
         </div>
       </div>
 
-      {/* Sidebar Navigation (Desktop Static Docked & Mobile Drawer) */}
+      {/* Sidebar Navigation (Desktop Sticky Floating Card & Mobile Drawer) */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-stone-200/90 flex flex-col justify-between transition-transform duration-300 md:translate-x-0 md:static md:z-auto shrink-0 shadow-xs md:shadow-none ${
-          mobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        className={`fixed inset-y-0 left-0 z-50 w-72 bg-white dark:bg-stone-900 border border-stone-200/90 dark:border-stone-800 flex flex-col transition-transform duration-300 md:translate-x-0 md:sticky md:top-24 md:self-start md:ml-4 lg:ml-6 md:my-6 md:rounded-3xl md:shadow-md md:max-h-[calc(100vh-7.5rem)] shrink-0 overflow-hidden ${
+          mobileSidebarOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full md:shadow-md"
         }`}
       >
         {/* Top Brand & User Profile Section */}
-        <div className="p-5 sm:p-6 overflow-y-auto">
+        <div className="p-5 sm:p-6 overflow-y-auto flex-1">
           {/* Logo */}
-          <div className="flex items-center justify-between pb-5 border-b border-stone-100">
+          <div className="flex items-center justify-between pb-5 border-b border-stone-100 dark:border-stone-800">
             <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="relative w-10 h-10 rounded-2xl overflow-hidden shrink-0 shadow-sm border border-stone-200/70 bg-white">
+              <div className="relative w-10 h-10 rounded-2xl overflow-hidden shrink-0 shadow-sm border border-stone-200/70 dark:border-stone-700 bg-white">
                 <Image
                   src="/pizzahub-logo.webp"
                   alt="PizzaHub Logo"
@@ -238,7 +237,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                 />
               </div>
               <div>
-                <span className="font-black text-stone-900 text-lg tracking-tight block leading-tight">
+                <span className="font-black text-stone-900 dark:text-stone-100 text-lg tracking-tight block leading-tight">
                   Pizza<span className="text-[#D91E18]">Hub</span>
                 </span>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 block">
@@ -250,7 +249,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
             <button
               type="button"
               onClick={() => setMobileSidebarOpen(false)}
-              className="md:hidden p-1.5 rounded-lg text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors"
+              className="md:hidden p-1.5 rounded-lg text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
               aria-label="Close menu"
             >
               <X className="w-5 h-5" />
@@ -258,7 +257,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
           </div>
 
           {/* User Profile Section (Avatar with Premium Gold Ring, Name, Email, Badges) */}
-          <div className="mt-5 p-3.5 rounded-2xl bg-stone-50 border border-stone-200/80 shadow-2xs">
+          <div className="mt-5 p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-800/60 border border-stone-200/80 dark:border-stone-700/60 shadow-2xs">
             <div className="flex items-center gap-3">
               <UserAvatar
                 src={user?.image}
@@ -268,16 +267,16 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                 className="border-stone-200 shadow-xs"
               />
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold text-stone-900 truncate">
+                <p className="text-xs font-bold text-stone-900 dark:text-stone-100 truncate">
                   {user?.name || "Kitchen User"}
                 </p>
-                <p className="text-[11px] text-stone-500 truncate">{user?.email}</p>
+                <p className="text-[11px] text-stone-500 dark:text-stone-400 truncate">{user?.email}</p>
               </div>
             </div>
 
             {/* Role & Subscription Plan Indicators */}
-            <div className="mt-3 pt-2.5 border-t border-stone-200/70 flex items-center justify-between">
-              <span className="text-[10px] uppercase font-black tracking-wider text-[#D91E18] bg-red-50 px-2 py-0.5 rounded-md border border-red-200/70">
+            <div className="mt-3 pt-2.5 border-t border-stone-200/70 dark:border-stone-700/60 flex items-center justify-between">
+              <span className="text-[10px] uppercase font-black tracking-wider text-[#D91E18] bg-red-50 dark:bg-red-950/60 px-2 py-0.5 rounded-md border border-red-200/70 dark:border-red-900/60">
                 {user?.role || "Customer"}
               </span>
 
@@ -318,8 +317,8 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                   onClick={() => setMobileSidebarOpen(false)}
                   className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all group ${
                     link.active
-                      ? "bg-red-50 text-[#D91E18] shadow-2xs border-l-3 border-[#D91E18]"
-                      : "text-stone-700 hover:text-stone-900 hover:bg-stone-100/80"
+                      ? "bg-red-50 dark:bg-red-950/40 text-[#D91E18] shadow-2xs border-l-3 border-[#D91E18]"
+                      : "text-stone-700 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-100/80 dark:hover:bg-stone-800"
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -327,7 +326,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                       className={`w-4 h-4 transition-colors ${
                         link.active
                           ? "text-[#D91E18]"
-                          : "text-stone-500 group-hover:text-[#D91E18]"
+                          : "text-stone-500 dark:text-stone-400 group-hover:text-[#D91E18]"
                       }`}
                     />
                     <span>{link.label}</span>
@@ -336,33 +335,27 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                     className={`w-3.5 h-3.5 transition-colors ${
                       link.active
                         ? "text-[#D91E18]"
-                        : "text-stone-300 group-hover:text-stone-600"
+                        : "text-stone-300 dark:text-stone-600 group-hover:text-stone-600"
                     }`}
                   />
                 </Link>
               );
             })}
+
+            {/* Sign Out Button placed directly under Profile Settings */}
+            <div className="pt-2 mt-2 border-t border-stone-100 dark:border-stone-800">
+              <button
+                type="button"
+                onClick={handleSignOut}
+                className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer group"
+              >
+                <div className="flex items-center gap-3">
+                  <LogOut className="w-4 h-4 text-red-500 group-hover:scale-110 transition-transform" />
+                  <span>Sign Out</span>
+                </div>
+              </button>
+            </div>
           </nav>
-        </div>
-
-        {/* Bottom Actions */}
-        <div className="p-5 sm:p-6 border-t border-stone-100 space-y-1.5 shrink-0">
-          <Link
-            href="/"
-            className="flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-bold text-stone-600 hover:text-stone-900 hover:bg-stone-50 transition-colors"
-          >
-            <Home className="w-4 h-4 text-stone-400" />
-            <span>Back to Home</span>
-          </Link>
-
-          <button
-            type="button"
-            onClick={handleSignOut}
-            className="w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-bold text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
-          >
-            <LogOut className="w-4 h-4 text-red-500" />
-            <span>Sign Out</span>
-          </button>
         </div>
       </aside>
 
