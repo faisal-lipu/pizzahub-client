@@ -206,8 +206,8 @@ export default function ReviewsSection({
       {/* Grid: Rating Breakdown + Review Submission Form */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Left: Star Breakdown Bars */}
-        <div className="lg:col-span-5 bg-stone-50/80 rounded-2xl p-6 border border-stone-200/70 space-y-3">
-          <h3 className="text-xs font-black uppercase tracking-wider text-stone-500 mb-2">
+        <div className="lg:col-span-5 bg-gradient-to-br from-[#152331] to-[#000000] text-white rounded-2xl p-6 border border-white/10 shadow-xl space-y-3">
+          <h3 className="text-xs font-black uppercase tracking-wider text-stone-300 mb-2">
             Rating Breakdown
           </h3>
           {[5, 4, 3, 2, 1].map((stars) => {
@@ -215,28 +215,28 @@ export default function ReviewsSection({
             const pct = totalReviews > 0 ? (count / totalReviews) * 100 : 0;
             return (
               <div key={stars} className="flex items-center gap-3 text-xs">
-                <span className="w-12 font-bold text-stone-700 flex items-center gap-1">
+                <span className="w-12 font-bold text-white flex items-center gap-1">
                   {stars} <Star className="w-3 h-3 text-amber-400 fill-amber-400 inline" />
                 </span>
-                <div className="flex-1 h-2 rounded-full bg-stone-200 overflow-hidden">
+                <div className="flex-1 h-2 rounded-full bg-white/15 overflow-hidden">
                   <div
                     className="h-full bg-amber-400 rounded-full transition-all duration-500"
                     style={{ width: `${pct}%` }}
                   />
                 </div>
-                <span className="w-8 text-right font-medium text-stone-400 text-[11px]">
+                <span className="w-8 text-right font-bold text-stone-300 text-[11px]">
                   {count}
                 </span>
               </div>
             );
           })}
 
-          <div className="mt-4 pt-4 border-t border-stone-200/60 text-xs text-stone-500 space-y-1">
-            <p className="font-bold text-stone-800">
+          <div className="mt-4 pt-4 border-t border-white/10 text-xs space-y-1">
+            <p className="font-bold text-white">
               Kitchen Rating: {vendorName}
             </p>
-            <p className="text-[11px] text-stone-500">
-              ★ 4.9 Restaurant Score • Top 5% Food Safety & Customer Satisfaction
+            <p className="text-[11px] text-stone-300">
+              <span className="text-amber-400 font-bold">★ 4.9</span> Restaurant Score • Top 5% Food Safety & Customer Satisfaction
             </p>
           </div>
         </div>

@@ -46,7 +46,9 @@ body {
 
 /* Background overrides in dark mode */
 .dark .bg-\[\#FAF8F5\],
-.dark .bg-stone-50 {
+.dark .bg-stone-50,
+.dark .bg-stone-50\/80,
+.dark .bg-stone-50\/50 {
   background-color: #0c0a09 !important;
 }
 
