@@ -417,14 +417,14 @@ function MenuContent() {
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
 
-                  <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-md text-stone-800 text-xs font-bold px-3 py-1 rounded-full shadow-sm">
+                  <span className="absolute top-3 left-3 bg-white/90 dark:bg-gradient-to-r dark:from-[#152331] dark:to-[#000000] backdrop-blur-md text-stone-800 dark:text-amber-300 dark:!text-amber-300 text-xs font-bold px-3 py-1 rounded-full shadow-sm border border-stone-200/60 dark:border-amber-400/30">
                     {pizza.category}
                   </span>
 
                   <button
                     type="button"
                     onClick={(e) => toggleFavorite(pizza, e)}
-                    className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-stone-600 hover:text-[#D91E18] shadow-sm transition-colors cursor-pointer"
+                    className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 dark:bg-stone-900/90 dark:border dark:border-stone-800 backdrop-blur-md flex items-center justify-center text-stone-600 dark:text-stone-300 hover:text-[#D91E18] dark:hover:text-[#D91E18] shadow-sm transition-colors cursor-pointer"
                     aria-label="Add to favorites"
                   >
                     <Heart

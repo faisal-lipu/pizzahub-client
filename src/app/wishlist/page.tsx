@@ -128,7 +128,7 @@ export default function WishlistPage() {
                     />
 
                     {/* Category Pill */}
-                    <span className="absolute top-3 left-3 bg-white/95 backdrop-blur-xs text-stone-800 text-[11px] font-black px-3 py-1 rounded-full shadow-xs border border-stone-200/60">
+                    <span className="absolute top-3 left-3 bg-white/95 dark:bg-gradient-to-r dark:from-[#152331] dark:to-[#000000] backdrop-blur-xs text-stone-800 dark:text-amber-300 dark:!text-amber-300 text-[11px] font-black px-3 py-1 rounded-full shadow-xs border border-stone-200/60 dark:border-amber-400/30">
                       {fav.category}
                     </span>
 
@@ -136,7 +136,7 @@ export default function WishlistPage() {
                     <button
                       type="button"
                       onClick={() => handleRemove(fav._id, fav.name)}
-                      className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/95 backdrop-blur-xs flex items-center justify-center text-stone-400 hover:text-red-600 transition-colors cursor-pointer shadow-xs border border-stone-200/60"
+                      className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/95 dark:bg-stone-900/90 dark:border dark:border-stone-800 backdrop-blur-xs flex items-center justify-center text-stone-400 dark:text-stone-300 hover:text-red-600 transition-colors cursor-pointer shadow-xs border border-stone-200/60"
                       title="Remove from Wishlist"
                       aria-label="Remove from Wishlist"
                     >
