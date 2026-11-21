@@ -159,7 +159,6 @@ export default function Navbar() {
     } else if (role === "admin") {
       links.push(
         { label: "Manage Users", href: "/dashboard/admin?tab=users" },
-        { label: "All Pizzas", href: "/dashboard/admin?tab=pizzas" },
         { label: "Transactions", href: "/dashboard/admin?tab=transactions" },
         { label: "Dashboard", href: "/dashboard/admin" }
       );
