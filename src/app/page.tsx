@@ -370,39 +370,41 @@ export default function HomePage() {
         {/* Background decorative pizza doodle SVG watermark */}
         <div className="absolute inset-0 pointer-events-none opacity-[0.03] -z-10 bg-[radial-gradient(#D91E18_1px,transparent_1px)] [background-size:20px_20px]" />
 
-        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 xl:gap-10 items-center">
+        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-12 items-stretch">
           {/* Left Text Column with Motion */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
-            className="lg:col-span-5 space-y-3.5 sm:space-y-4 w-full text-left"
+            className="lg:col-span-6 flex flex-col justify-between w-full text-left"
           >
-            {/* PizzaHub Fresh Kicker (Moved down per annotation: "আরো নিচে নামবে") */}
-            <div className="inline-flex items-center gap-2 bg-amber-50 dark:bg-amber-950/50 border border-amber-200/90 dark:border-amber-800/80 px-4 py-1.5 rounded-full shadow-2xs mt-2.5 sm:mt-3.5">
-              <span className="font-serif italic text-sm font-bold text-amber-800 dark:text-amber-400 tracking-wide">
-                Artisan Woodfired Pizza
-              </span>
-              <span className="text-amber-500 text-sm">✨</span>
+            <div>
+              {/* PizzaHub Fresh Kicker */}
+              <div className="inline-flex items-center gap-2 bg-amber-50 dark:bg-amber-950/50 border border-amber-200/90 dark:border-amber-800/80 px-4 py-1.5 rounded-full shadow-2xs">
+                <span className="font-serif italic text-sm font-bold text-amber-800 dark:text-amber-400 tracking-wide">
+                  Artisan Woodfired Pizza
+                </span>
+                <span className="text-amber-500 text-sm">✨</span>
+              </div>
+
+              {/* Clear Headline (Large, Bold & Commanding) */}
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[44px] xl:text-[50px] font-black tracking-tight text-stone-900 dark:text-stone-100 leading-[1.12] mt-3.5 sm:mt-4">
+                Hot &amp; Fresh Pizza{" "}
+                <span className="block text-[#D91E18]">Delivered to Your Door.</span>
+              </h1>
+
+              {/* Short Description */}
+              <p className="text-sm sm:text-base text-stone-600 dark:text-stone-300 font-medium max-w-xl leading-relaxed mt-3 sm:mt-4">
+                Craving authentic stone-oven pizza? Enjoy hand-tossed artisanal pizzas baked with
+                fresh San Marzano sauce, 100% real mozzarella, and gourmet toppings delivered hot to your doorstep.
+              </p>
             </div>
 
-            {/* Clear Headline (Large, Bold & Commanding) */}
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[46px] xl:text-[52px] font-black tracking-tight text-stone-900 dark:text-stone-100 leading-[1.12]">
-              Hot &amp; Fresh Pizza{" "}
-              <span className="block text-[#D91E18]">Delivered to Your Door.</span>
-            </h1>
-
-            {/* Short Description */}
-            <p className="text-sm sm:text-base text-stone-600 dark:text-stone-300 font-medium max-w-xl leading-relaxed">
-              Craving authentic stone-oven pizza? Enjoy hand-tossed artisanal pizzas baked with
-              fresh San Marzano sauce, 100% real mozzarella, and gourmet toppings delivered hot to your doorstep.
-            </p>
-
-            {/* Action Buttons (Moved up per annotation: "আরো উপরে উঠবে") */}
-            <div className="flex flex-wrap items-center gap-4 pt-0 mt-0.5">
+            {/* Action Buttons: SIDE BY SIDE (পাশাপাশি) per Screenshot 1 */}
+            <div className="flex flex-nowrap items-center gap-3 sm:gap-4 pt-4 mt-auto">
               <Link
                 href="/menu"
-                className="inline-flex items-center gap-2.5 bg-[#D91E18] hover:bg-[#B91C1C] text-white font-bold text-sm sm:text-base px-7 sm:px-8 py-3.5 sm:py-4 rounded-full shadow-lg shadow-red-500/25 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+                className="inline-flex items-center justify-center gap-2 bg-[#D91E18] hover:bg-[#B91C1C] text-white font-bold text-sm sm:text-base px-6 sm:px-7 py-3.5 sm:py-4 rounded-full shadow-lg shadow-red-500/25 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer whitespace-nowrap shrink-0"
               >
                 <Pizza className="w-5 h-5 stroke-[2]" />
                 <span>Explore Pizza Menu</span>
@@ -412,7 +414,7 @@ export default function HomePage() {
               <button
                 type="button"
                 onClick={() => setVideoModalOpen(true)}
-                className="inline-flex items-center gap-2.5 bg-white dark:bg-stone-900 hover:bg-stone-50 dark:hover:bg-stone-800 text-stone-800 dark:text-stone-200 font-bold text-sm sm:text-base px-6 sm:px-7 py-3.5 sm:py-4 rounded-full border border-stone-200 dark:border-stone-800 shadow-xs transition-all cursor-pointer hover:border-stone-300"
+                className="inline-flex items-center justify-center gap-2 bg-white dark:bg-stone-900 hover:bg-stone-50 dark:hover:bg-stone-800 text-stone-800 dark:text-stone-200 font-bold text-sm sm:text-base px-5 sm:px-6 py-3.5 sm:py-4 rounded-full border border-stone-200 dark:border-stone-800 shadow-xs transition-all cursor-pointer hover:border-stone-300 whitespace-nowrap shrink-0"
               >
                 <span className="w-6 h-6 rounded-full bg-red-100 dark:bg-red-950/60 flex items-center justify-center text-[#D91E18]">
                   <Play className="w-3 h-3 fill-[#D91E18] ml-0.5" />
@@ -420,36 +422,20 @@ export default function HomePage() {
                 <span>Watch Video</span>
               </button>
             </div>
-
-            {/* Quick Metrics Bar */}
-            <div className="pt-3 sm:pt-4 grid grid-cols-3 gap-6 sm:gap-8 border-t border-stone-200/80 dark:border-stone-800 max-w-md w-full">
-              <div>
-                <p className="text-2xl sm:text-3xl font-black text-stone-900 dark:text-stone-100 leading-tight">15m</p>
-                <p className="text-xs font-bold text-stone-500 uppercase tracking-wider mt-0.5">Fast Delivery</p>
-              </div>
-              <div>
-                <p className="text-2xl sm:text-3xl font-black text-stone-900 dark:text-stone-100 leading-tight">100%</p>
-                <p className="text-xs font-bold text-stone-500 uppercase tracking-wider mt-0.5">Fresh Sourced</p>
-              </div>
-              <div>
-                <p className="text-2xl sm:text-3xl font-black text-[#D91E18] leading-tight">4.9 ★</p>
-                <p className="text-xs font-bold text-stone-500 uppercase tracking-wider mt-0.5">Customer Love</p>
-              </div>
-            </div>
           </motion.div>
 
-          {/* Right Visual Column (Expanded width leftwards and height upwards per annotations) */}
+          {/* Right Visual Column - Height aligns with Artisan Woodfired Pizza at top and buttons at bottom */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.15, ease: "easeOut" }}
-            className="lg:col-span-7 relative w-full flex items-center justify-center lg:justify-end"
+            className="lg:col-span-6 relative w-full h-full min-h-[350px] lg:min-h-0 flex items-stretch justify-center lg:justify-end"
           >
             {/* Background Warm Sunburst Shape */}
-            <div className="absolute w-80 sm:w-96 lg:w-[600px] h-72 sm:h-80 lg:h-[440px] rounded-full bg-gradient-to-tr from-amber-400/30 via-amber-200/30 to-red-100/20 blur-2xl -z-10" />
+            <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-amber-400/30 via-amber-200/30 to-red-100/20 blur-2xl -z-10" />
 
             {/* Floating Top Badge: 100% Real Cheese */}
-            <div className="absolute -top-3.5 -left-2 sm:-left-4 z-10 bg-white/95 dark:bg-stone-900/95 backdrop-blur-md rounded-2xl px-4 py-2 sm:px-4.5 sm:py-2.5 shadow-xl border border-stone-200/90 dark:border-stone-800 flex items-center gap-2.5">
+            <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-10 bg-white/95 dark:bg-stone-900/95 backdrop-blur-md rounded-2xl px-4 py-2 sm:px-4.5 sm:py-2.5 shadow-xl border border-stone-200/90 dark:border-stone-800 flex items-center gap-2.5">
               <span className="text-xl sm:text-2xl">🧀</span>
               <div>
                 <p className="text-xs sm:text-sm font-black text-stone-900 dark:text-stone-100 leading-tight">100% Mozzarella</p>
@@ -457,14 +443,14 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Hero Pizza Composition (Large 4:3 Rectangular Frame expanded left and up) */}
-            <div className="relative w-full max-w-[540px] sm:max-w-[600px] lg:max-w-[660px] xl:max-w-[700px] aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border-4 border-white dark:border-stone-800 transform hover:scale-[1.01] transition-transform duration-300">
+            {/* Hero Pizza Composition - Matches height of left column content */}
+            <div className="relative w-full h-full min-h-[340px] sm:min-h-[370px] rounded-3xl overflow-hidden shadow-2xl border-4 border-white dark:border-stone-800 transform hover:scale-[1.01] transition-transform duration-300">
               <Image
                 src="/banner.jpg"
                 alt="Hot & Fresh Artisan Woodfired Pizza with melted cheese and fresh toppings"
                 fill
                 priority
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 58vw, 700px"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 650px"
                 className="object-cover object-center"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
@@ -487,6 +473,33 @@ export default function HomePage() {
             </div>
           </motion.div>
         </div>
+
+        {/* Centered 3 Metrics Badges (Moved to Center per 2nd Screenshot) */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.4 }}
+          className="mt-12 lg:mt-16 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 max-w-3xl mx-auto"
+        >
+          {/* Badge 1: Fast Delivery */}
+          <div className="bg-white dark:bg-stone-900 border border-stone-200/90 dark:border-stone-800 rounded-2xl p-5 sm:p-6 text-center shadow-xs hover:border-amber-300 dark:hover:border-amber-700 transition-colors">
+            <p className="text-3xl sm:text-4xl font-black text-stone-900 dark:text-stone-100 leading-tight">15m</p>
+            <p className="text-xs font-bold text-stone-500 uppercase tracking-wider mt-1.5">Fast Delivery</p>
+          </div>
+
+          {/* Badge 2: Fresh Sourced */}
+          <div className="bg-white dark:bg-stone-900 border border-stone-200/90 dark:border-stone-800 rounded-2xl p-5 sm:p-6 text-center shadow-xs hover:border-amber-300 dark:hover:border-amber-700 transition-colors">
+            <p className="text-3xl sm:text-4xl font-black text-stone-900 dark:text-stone-100 leading-tight">100%</p>
+            <p className="text-xs font-bold text-stone-500 uppercase tracking-wider mt-1.5">Fresh Sourced</p>
+          </div>
+
+          {/* Badge 3: Customer Love */}
+          <div className="bg-white dark:bg-stone-900 border border-stone-200/90 dark:border-stone-800 rounded-2xl p-5 sm:p-6 text-center shadow-xs hover:border-red-300 dark:hover:border-red-800 transition-colors">
+            <p className="text-3xl sm:text-4xl font-black text-[#D91E18] leading-tight">4.9 ★</p>
+            <p className="text-xs font-bold text-stone-500 uppercase tracking-wider mt-1.5">Customer Love</p>
+          </div>
+        </motion.div>
       </section>
 
       {/* ========================================================
