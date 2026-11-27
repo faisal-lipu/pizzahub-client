@@ -125,6 +125,7 @@ function VendorDashboardInner() {
   const [image, setImage] = useState("");
   const [prepTime, setPrepTime] = useState("15");
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadError, setUploadError] = useState("");
   const [addingItem, setAddingItem] = useState(false);
 
   // Edit Item modal state
@@ -207,11 +208,23 @@ function VendorDashboardInner() {
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
-      toast.error("Please upload a valid image file (PNG, JPG, JPEG, WEBP).");
+      const msg = "Please upload a valid image file (PNG, JPG, JPEG, WEBP).";
+      setUploadError(msg);
+      toast.error(msg);
+      e.target.value = "";
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      const msg = "Image file must be 5MB or smaller.";
+      setUploadError(msg);
+      toast.error(msg);
+      e.target.value = "";
       return;
     }
 
     try {
+      setUploadError("");
       setUploadingImage(true);
       toast.info("Uploading image to ImgBB...");
       const hostedUrl = await uploadToImgBB(file);
@@ -219,17 +232,12 @@ function VendorDashboardInner() {
       toast.success("Image uploaded successfully to ImgBB!");
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Failed to upload image to ImgBB.";
+      setImage("");
+      setUploadError(msg);
       toast.error(msg);
-      // Fallback preview so user is not blocked
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        if (event.target?.result) {
-          setImage(String(event.target.result));
-        }
-      };
-      reader.readAsDataURL(file);
     } finally {
       setUploadingImage(false);
+      e.target.value = "";
     }
   };
 
@@ -237,6 +245,18 @@ function VendorDashboardInner() {
   const handleEditImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please upload a valid image file (PNG, JPG, JPEG, WEBP).");
+      e.target.value = "";
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image file must be 5MB or smaller.");
+      e.target.value = "";
+      return;
+    }
 
     try {
       setUploadingImage(true);
@@ -249,6 +269,7 @@ function VendorDashboardInner() {
       toast.error(msg);
     } finally {
       setUploadingImage(false);
+      e.target.value = "";
     }
   };
 
@@ -266,6 +287,12 @@ function VendorDashboardInner() {
       return;
     }
 
+    const parsedPrice = parseFloat(price);
+    if (!Number.isFinite(parsedPrice) || parsedPrice <= 0) {
+      toast.error("Please enter a valid positive price.");
+      return;
+    }
+
     if (!image.trim()) {
       toast.error("Please upload an item image using ImgBB (required).");
       return;
@@ -279,7 +306,7 @@ function VendorDashboardInner() {
           itemName: name.trim(),
           name: name.trim(),
           description: description.trim(),
-          price: parseFloat(price),
+          price: parsedPrice,
           category,
           location: location.trim() || user?.businessName || "Downtown Kitchen, New York",
           image: image.trim(),
@@ -294,6 +321,7 @@ function VendorDashboardInner() {
         setDescription("");
         setPrice("");
         setImage("");
+        setUploadError("");
         setActiveTab("menu");
         fetchVendorData();
       } else {
@@ -335,7 +363,7 @@ function VendorDashboardInner() {
             category: editCategory,
             description: editDescription.trim(),
             location: editLocation.trim(),
-            images: [editImage.trim()],
+            ...(editImage.trim() ? { images: [editImage.trim()] } : {}),
           },
         }
       );
@@ -925,7 +953,14 @@ function VendorDashboardInner() {
                   <span className="text-[11px] text-stone-400">PNG, JPG, WEBP up to 5MB</span>
                 </label>
 
-                {image && (
+                {uploadError && (
+                  <div className="mt-4 p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 font-semibold flex items-center justify-center gap-2">
+                    <AlertTriangle className="w-4 h-4 shrink-0 text-red-600" />
+                    <span>{uploadError}</span>
+                  </div>
+                )}
+
+                {image && !uploadError && (
                   <div className="mt-4 flex items-center justify-center gap-3 p-2 bg-white rounded-xl border border-stone-200 inline-flex mx-auto">
                     <div className="relative w-12 h-12 rounded-lg overflow-hidden shrink-0">
                       <PizzaImage src={image} alt="Uploaded preview" fill className="object-cover" />
