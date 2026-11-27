@@ -119,12 +119,14 @@ function AdminDashboardContent() {
   useEffect(() => {
     if (tabParam && ["overview", "users", "menu", "transactions"].includes(tabParam)) {
       setActiveTab(tabParam);
+    } else if (!tabParam) {
+      setActiveTab("overview");
     }
   }, [tabParam]);
 
   const handleTabChange = (newTab: "overview" | "users" | "menu" | "transactions") => {
     setActiveTab(newTab);
-    router.replace(`/dashboard/admin?tab=${newTab}`);
+    router.replace(`/dashboard/admin?tab=${newTab}`, { scroll: false });
   };
 
   const [usersList, setUsersList] = useState<AdminUser[]>([]);
@@ -596,7 +598,7 @@ function AdminDashboardContent() {
                 type="button"
                 onClick={() => {
                   setMenuStatusFilter("pending");
-                  setActiveTab("menu");
+                  handleTabChange("menu");
                 }}
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#D91E18] hover:bg-[#B91C1C] text-white font-bold text-xs shadow-md shadow-red-500/20 cursor-pointer transition-all"
               >
@@ -623,7 +625,7 @@ function AdminDashboardContent() {
                 <span>Completed Transactions: <strong>{totalTransactions}</strong></span>
                 <button
                   type="button"
-                  onClick={() => setActiveTab("transactions")}
+                  onClick={() => handleTabChange("transactions")}
                   className="font-bold text-[#D91E18] hover:underline cursor-pointer"
                 >
                   View Transaction Ledger &rarr;

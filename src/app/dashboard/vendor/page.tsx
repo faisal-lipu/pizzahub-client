@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import PizzaImage from "@/components/PizzaImage";
 import ConfirmModal from "@/components/ConfirmModal";
@@ -88,6 +88,7 @@ const CATEGORIES = [
 
 function VendorDashboardInner() {
   const { user, updateUser } = useAuth();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab") as "overview" | "menu" | "add" | "orders" | "subscription" | null;
 
@@ -96,10 +97,17 @@ function VendorDashboardInner() {
   );
 
   useEffect(() => {
-    if (tabParam) {
+    if (tabParam && ["overview", "menu", "add", "orders", "subscription"].includes(tabParam)) {
       setActiveTab(tabParam);
+    } else if (!tabParam) {
+      setActiveTab("overview");
     }
   }, [tabParam]);
+
+  const handleTabChange = (newTab: "overview" | "menu" | "add" | "orders" | "subscription") => {
+    setActiveTab(newTab);
+    router.replace(`/dashboard/vendor?tab=${newTab}`, { scroll: false });
+  };
 
   const [items, setItems] = useState<MenuItem[]>([]);
   const [orders, setOrders] = useState<VendorOrder[]>([]);
@@ -322,7 +330,7 @@ function VendorDashboardInner() {
         setPrice("");
         setImage("");
         setUploadError("");
-        setActiveTab("menu");
+        handleTabChange("menu");
         fetchVendorData();
       } else {
         toast.error(response.message || "Failed to add menu item.");
@@ -649,7 +657,7 @@ function VendorDashboardInner() {
           </button>
           <button
             type="button"
-            onClick={() => setActiveTab("add")}
+            onClick={() => handleTabChange("add")}
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#D91E18] hover:bg-[#B91C1C] text-white font-bold text-xs shadow-md shadow-red-500/20 cursor-pointer transition-all"
           >
             <PlusCircle className="w-4 h-4" />
@@ -674,7 +682,7 @@ function VendorDashboardInner() {
             <button
               key={tab.id}
               type="button"
-              onClick={() => setActiveTab(tab.id as typeof activeTab)}
+              onClick={() => handleTabChange(tab.id as typeof activeTab)}
               className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
                 isActive
                   ? "bg-stone-900 text-white shadow-sm"
@@ -747,7 +755,7 @@ function VendorDashboardInner() {
               </div>
               <button
                 type="button"
-                onClick={() => setActiveTab("subscription")}
+                onClick={() => handleTabChange("subscription")}
                 className="px-5 py-2.5 rounded-full bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-sm whitespace-nowrap cursor-pointer transition-all"
               >
                 Upgrade to Premium
@@ -1033,7 +1041,7 @@ function VendorDashboardInner() {
               <p className="text-sm font-bold text-stone-700">You haven&apos;t created any menu items yet.</p>
               <button
                 type="button"
-                onClick={() => setActiveTab("add")}
+                onClick={() => handleTabChange("add")}
                 className="mt-4 px-5 py-2.5 rounded-full bg-[#D91E18] text-white font-bold text-xs shadow-sm hover:bg-[#B91C1C]"
               >
                 Add Your First Pizza

@@ -217,7 +217,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
       {/* Sidebar Navigation (Desktop Sticky Floating Card & Mobile Drawer) */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-72 bg-white dark:bg-stone-900 border border-stone-200/90 dark:border-stone-800 flex flex-col transition-transform duration-300 md:translate-x-0 md:sticky md:top-24 md:self-start md:ml-4 lg:ml-6 md:my-6 md:rounded-3xl md:shadow-md md:max-h-[calc(100vh-7.5rem)] shrink-0 overflow-hidden ${
+        className={`fixed inset-y-0 left-0 z-50 w-72 bg-white dark:bg-stone-900 border border-stone-200/90 dark:border-stone-800 flex flex-col transition-transform duration-300 md:translate-x-0 md:sticky md:inset-y-auto md:z-30 md:top-24 md:self-start md:ml-4 lg:ml-6 md:my-6 md:rounded-3xl md:shadow-md md:max-h-[calc(100vh-7.5rem)] shrink-0 overflow-hidden ${
           mobileSidebarOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full md:shadow-md"
         }`}
       >

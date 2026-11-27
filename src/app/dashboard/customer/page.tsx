@@ -118,6 +118,8 @@ function CustomerDashboardInner() {
   useEffect(() => {
     if (tabParam === "orders" || tabParam === "overview" || tabParam === "favorites" || tabParam === "notifications") {
       setActiveTab(tabParam);
+    } else if (!tabParam) {
+      setActiveTab("overview");
     }
   }, [tabParam]);
 
@@ -136,7 +138,7 @@ function CustomerDashboardInner() {
 
   const handleTabChange = (tab: "overview" | "orders" | "favorites" | "notifications") => {
     setActiveTab(tab);
-    router.replace(`/dashboard/customer?tab=${tab}`);
+    router.replace(`/dashboard/customer?tab=${tab}`, { scroll: false });
   };
 
   // View Order Details Modal State
